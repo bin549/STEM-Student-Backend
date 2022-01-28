@@ -14,6 +14,7 @@ class CourseSerializer(serializers.ModelSerializer):
             "created_time",
             "owner",
             "genre",
+            "get_absolute_url",
         )
 
 
@@ -25,7 +26,6 @@ class GenreSerializer(serializers.ModelSerializer):
             "id",
             "name"
         )
-
 
 
 class SelectionSerializer(serializers.ModelSerializer):

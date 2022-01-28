@@ -7,15 +7,20 @@ class Genre(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     name = models.CharField(max_length=200, blank=True, null=True)
+    slug = models.SlugField()
 
     def __str__(self):
         return '%s' % self.name
+
+    def get_absolute_url(self):
+        return f'/{self.slug}/'
 
 
 class Entity(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     title = models.CharField(max_length=200)
+    slug = models.SlugField()
     description = models.TextField(null=True, blank=True)
     cover_img = models.ImageField(null=True, blank=True, upload_to='profiles/', default="profiles/user-default.png")
     created_time = models.DateTimeField(auto_now_add=True)
@@ -24,6 +29,9 @@ class Entity(models.Model):
 
     def __str__(self):
         return '%s' % self.title
+
+    def get_absolute_url(self):
+        return f'/{self.genre.slug}/{self.slug}/'
 
 
 class Selection(models.Model):
