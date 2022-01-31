@@ -13,6 +13,14 @@ class AllCourse(APIView):
         return Response(serializer.data)
 
 
+class AllRecomendedCourse(APIView):
+
+    def get(self, request, format=None):
+        courses = Entity.objects.all()[0:4]
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data)
+
+
 class AllGenre(APIView):
 
     def get(self, request, format=None):
