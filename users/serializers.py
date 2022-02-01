@@ -15,6 +15,6 @@ class UserSerializer(serializers.ModelSerializer):
             "short_intro",
             "bio",
             "profile_image",
-            "created",
+            "created_time",
             "user_type",
         )

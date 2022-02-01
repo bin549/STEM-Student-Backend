@@ -3,6 +3,8 @@ from rest_framework.response import Response
 from .models import Entity, Genre, Selection, Collection
 from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, CollectionSerializer
 from django.http import Http404
+from rest_framework.decorators import api_view
+from django.db.models import Q
 
 
 class AllCourse(APIView):
@@ -71,3 +73,14 @@ class GenreDetail(APIView):
         genre = self.get_object(genre_slug)
         serializer = GenreSerializer(genre)
         return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getUserSelection(request, pk):
+    selections = Selection.objects.filter(Q(user=pk))
+    courses = []
+    for e in selections:
+        course = Entity.objects.get(Q(id=e.course.id))
+        courses.append(course)
+    serializer = CourseSerializer(courses, many=True)
+    return Response(serializer.data)
