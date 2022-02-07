@@ -11,4 +11,5 @@ urlpatterns = [
     path('courses/<slug:genre_slug>/<slug:course_slug>/', views.CourseDetail.as_view()),
     path('courses/<slug:genre_slug>/', views.GenreDetail.as_view()),
     path('getUserSelection/<str:pk>/', views.getUserSelection),
+    path('getCourseLessons/<str:course_id>/', views.getCourseLessons),
 ]

@@ -33,6 +33,11 @@ class Entity(models.Model):
     def get_absolute_url(self):
         return f'/{self.genre.slug}/{self.slug}/'
 
+    def get_image(self):
+        if self.cover_img:
+            return 'http://127.0.0.1:8000' + self.cover_img.url
+        return ''
+
 
 class Selection(models.Model):
 

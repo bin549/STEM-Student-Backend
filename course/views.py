@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Entity, Genre, Selection, Collection
-from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, CollectionSerializer
+from .models import Entity, Genre, Selection, Collection, Lecture
+from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, CollectionSerializer, LectureSerializer
 from django.http import Http404
 from rest_framework.decorators import api_view
 from django.db.models import Q
@@ -83,4 +83,11 @@ def getUserSelection(request, pk):
         course = Entity.objects.get(Q(id=e.course.id))
         courses.append(course)
     serializer = CourseSerializer(courses, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getCourseLessons(request, course_id):
+    lectures = Lecture.objects.filter(Q(course=course_id))
+    serializer = LectureSerializer(lectures, many=True)
     return Response(serializer.data)

@@ -17,4 +17,5 @@ class UserSerializer(serializers.ModelSerializer):
             "profile_image",
             "created_time",
             "user_type",
+            "get_image",
         )

@@ -37,6 +37,11 @@ class Profile(models.Model):
             url = ''
         return url
 
+    def get_image(self):
+        if self.profile_image:
+            return 'http://127.0.0.1:8000' + self.profile_image.url
+        return ''
+
 
 class Notification(models.Model):
 
