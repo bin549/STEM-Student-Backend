@@ -16,6 +16,7 @@ class CourseSerializer(serializers.ModelSerializer):
             "genre",
             "get_absolute_url",
             "get_image",
+            "get_student_url",
         )
 
 

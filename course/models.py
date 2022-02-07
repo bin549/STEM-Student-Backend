@@ -27,6 +27,7 @@ class Entity(models.Model):
     owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, null=True, blank=True, on_delete=models.CASCADE)
 
+
     def __str__(self):
         return '%s' % self.title
 
@@ -37,6 +38,9 @@ class Entity(models.Model):
         if self.cover_img:
             return 'http://127.0.0.1:8000' + self.cover_img.url
         return ''
+
+    def get_student_url(self):
+        return f'/course_student/{self.id}/'
 
 
 class Selection(models.Model):
