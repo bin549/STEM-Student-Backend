@@ -26,7 +26,7 @@ class Entity(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, null=True, blank=True, on_delete=models.CASCADE)
-
+    serial_number = models.IntegerField()
 
     def __str__(self):
         return '%s' % self.title

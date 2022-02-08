@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from django.db.models import Q
 from users.models import Profile
 from users.serializers import UserSerializer
+import datetime
 
 
 class AllCourse(APIView):
@@ -137,3 +138,46 @@ class SelectionUser(APIView):
             students.append(student)
         serializer = UserSerializer(students, many=True)
         return Response(serializer.data)
+
+
+@api_view(['POST'])
+def createCourse(request):
+    future_course = Entity()
+    owner = Profile.objects.get(Q(id=request.data['ownerId']))
+    genre = Genre.objects.get(Q(id="869d268e-09f6-4177-96b4-585707e85545"))
+    future_course.owner = owner
+    future_course.title = request.data['title']
+    future_course.description = request.data['description']
+    future_course.slug = 3
+    future_course.cover_img = "profiles/project-1.jpg"
+    future_course.created_time = datetime.timedelta(days=30)
+    future_course.genre = genre
+    future_course.save()
+    return Response('createCourse!')
+
+
+@api_view(['POST'])
+def updateCourse(request, pk):
+    print(request.data)
+    print(request.data)
+    print(request.data)
+    print(request.data)
+    return None
+
+
+@api_view(['POST'])
+def deleteCourse(request):
+    print(request.data)
+    print(request.data)
+    print(request.data)
+    print(request.data)
+    course = Entity.objects.get(Q(id=request.data['courseId']))
+    course.delete()
+    return Response('Tag was deleted!')
+
+
+@api_view(['GET'])
+def getSerialNumber(request):
+    courses = Entity.objects.filter(Q(owner=user_id))
+    serializer = CourseSerializer(courses, many=True)
+    return Response(serializer.data)
