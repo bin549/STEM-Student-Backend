@@ -192,6 +192,11 @@ def registerCourse(request):
         if existed_selection:
             return Response('Register Before', status=status.HTTP_201_CREATED)
     except Exception:
+        try:
+            wishlist = Wishlist.objects.get(Q(user=user.id) & Q(course=course.id))
+            wishlist.delete()
+        except Exception:
+            print('wishlist was deleted!')
         new_selection = Selection()
         new_selection.user = user
         new_selection.course = course
