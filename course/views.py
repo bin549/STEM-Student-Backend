@@ -1,13 +1,14 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Entity, Genre, Selection, Collection, Lecture
-from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, CollectionSerializer, LectureSerializer
+from .models import Entity, Genre, Selection, Wishlist, Lecture
+from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, WishlistSerializer, LectureSerializer
 from django.http import Http404
 from rest_framework.decorators import api_view
 from django.db.models import Q
 from users.models import Profile
 from users.serializers import UserSerializer
 import datetime
+from rest_framework import status
 
 
 class AllCourse(APIView):
@@ -45,8 +46,8 @@ class AllSelection(APIView):
 class AllCollection(APIView):
 
     def get(self, request, format=None):
-        collections = Collection.objects.all()[0:4]
-        serializer = CollectionSerializer(collections, many=True)
+        collections = Wishlist.objects.all()[0:4]
+        serializer = WishlistSerializer(collections, many=True)
         return Response(serializer.data)
 
 
@@ -97,8 +98,8 @@ def getCourseLessons(request, course_id):
 
 
 @api_view(['GET'])
-def getUserCollection(request, user_id):
-    collections = Collection.objects.filter(Q(user=user_id))
+def getUserWishlist(request, user_id):
+    collections = Wishlist.objects.filter(Q(user=user_id))
     courses = []
     for c in collections:
         course = Entity.objects.get(Q(id=c.course.id))
@@ -181,3 +182,23 @@ def getSerialNumber(request):
     courses = Entity.objects.filter(Q(owner=user_id))
     serializer = CourseSerializer(courses, many=True)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+def registerCourse(request):
+    try:
+        user = Profile.objects.get(Q(id=request.data['userId']))
+        course = Entity.objects.get(Q(serial_number=request.data['serialNumber']))
+    except Exception:
+        return Response('Not Existed', status=status.HTTP_201_CREATED)
+    try:
+        existed_selection = Selection.objects.get(Q(user=user.id) & Q(course=course.id))
+        if existed_selection:
+            return Response('Register Before', status=status.HTTP_201_CREATED)
+    except Exception:
+        new_selection = Selection()
+        new_selection.user = user
+        new_selection.course = course
+        new_selection.select_time = datetime.timedelta(days=30)
+        new_selection.save()
+    return Response('Register Success.')

@@ -12,11 +12,12 @@ urlpatterns = [
     path('courses/<slug:genre_slug>/', views.GenreDetail.as_view()),
     path('getUserSelection/<str:user_id>/', views.getUserSelection),
     path('getCourseLessons/<str:course_id>/', views.getCourseLessons),
-    path('getUserCollection/<str:user_id>/', views.getUserCollection),
+    path('getUserWishlist/<str:user_id>/', views.getUserWishlist),
     path('getOwnerCourse/<str:user_id>/', views.getOwnerCourse),
     path('course_student/<slug:course_slug>/', views.SelectionUser.as_view()),
     path('createCourse/', views.createCourse),
     path('updateCourse/<str:pk>/', views.updateCourse),
     path('deleteCourse/', views.deleteCourse),
     path('getSerialNumber/', views.getSerialNumber),
+    path('registerCourse/', views.registerCourse),
 ]

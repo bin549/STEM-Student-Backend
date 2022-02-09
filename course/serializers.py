@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Entity, Genre, Selection, Collection, Lecture
+from .models import Entity, Genre, Selection, Wishlist, Lecture
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -43,10 +43,10 @@ class SelectionSerializer(serializers.ModelSerializer):
         )
 
 
-class CollectionSerializer(serializers.ModelSerializer):
+class WishlistSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Collection
+        model = Wishlist
         fields = (
             "id",
             "user",

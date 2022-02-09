@@ -54,7 +54,7 @@ class Selection(models.Model):
         return '%s' % self.id
 
 
-class Collection(models.Model):
+class Wishlist(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, unique=True,primary_key=True, editable=False)
     user = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
