@@ -20,4 +20,8 @@ urlpatterns = [
     path('deleteCourse/', views.deleteCourse),
     path('getSerialNumber/', views.getSerialNumber),
     path('registerCourse/', views.registerCourse),
+    path('getCourseStatus/', views.getCourseStatus),
+    path('getWishlistStatus/', views.getWishlistStatus),
+    path('addWishlist/', views.addWishlist),
+    path('removeWishlist/', views.removeWishlist),
 ]

@@ -168,10 +168,6 @@ def updateCourse(request, pk):
 
 @api_view(['POST'])
 def deleteCourse(request):
-    print(request.data)
-    print(request.data)
-    print(request.data)
-    print(request.data)
     course = Entity.objects.get(Q(id=request.data['courseId']))
     course.delete()
     return Response('Tag was deleted!')
@@ -202,3 +198,47 @@ def registerCourse(request):
         new_selection.select_time = datetime.timedelta(days=30)
         new_selection.save()
     return Response('Register Success.')
+
+
+@api_view(['POST'])
+def getCourseStatus(request):
+    try:
+        selection = Selection.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        return Response(1)
+    except Exception:
+        return Response(0)
+
+
+@api_view(['POST'])
+def getWishlistStatus(request):
+    try:
+        wishlist = Wishlist.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        return Response(1)
+    except Exception:
+        return Response(0)
+
+
+@api_view(['POST'])
+def addWishlist(request):
+    try:
+        wishlist = Wishlist.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        return Response(0)
+    except Exception:
+        new_wishlist = Wishlist()
+        user = Profile.objects.get(Q(id=request.data['userId']))
+        course = Entity.objects.get(Q(id=request.data['courseId']))
+        new_wishlist.user = user
+        new_wishlist.course = course
+        new_wishlist.collect_time = datetime.timedelta(days=30)
+        new_wishlist.save()
+        return Response(1)
+
+
+@api_view(['POST'])
+def removeWishlist(request):
+    try:
+        wishlist = Wishlist.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        wishlist.delete()
+        return Response(1)
+    except Exception:
+        return Response(0)
