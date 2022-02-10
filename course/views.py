@@ -19,6 +19,14 @@ class AllCourse(APIView):
         return Response(serializer.data)
 
 
+class AllVisibleCourse(APIView):
+
+    def get(self, request, format=None):
+        courses = Entity.objects.filter(Q(is_visible=True))
+        serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data)
+
+
 class AllRecomendedCourse(APIView):
 
     def get(self, request, format=None):
@@ -51,16 +59,27 @@ class AllCollection(APIView):
         return Response(serializer.data)
 
 
+@api_view(['GET'])
+def getCourseDetail(request, course_name):
+    try:
+        course = Entity.objects.get(title=course_name)
+        serializer = CourseSerializer(course, many=False)
+        return Response(serializer.data)
+    except Entity.DoesNotExist:
+        raise Http404
+
+
+
 class CourseDetail(APIView):
 
-    def get_object(self, genre_slug, course_slug):
+    def get_object(self, course_id):
         try:
-            return Entity.objects.filter(genre__slug=genre_slug).get(slug=course_slug)
+            return Entity.objects.get(id=course_id)
         except Entity.DoesNotExist:
             raise Http404
 
-    def get(self, request, genre_slug, course_slug, format=None):
-        course = self.get_object(genre_slug, course_slug)
+    def get(self, request, course_id, format=None):
+        course = self.get_object(course_id)
         serializer = CourseSerializer(course)
         return Response(serializer.data)
 
@@ -91,7 +110,7 @@ def getUserSelection(request, user_id):
 
 
 @api_view(['GET'])
-def getCourseLessons(request, course_id):
+def getCourseLectures(request, course_id):
     lectures = Lecture.objects.filter(Q(course=course_id))
     serializer = LectureSerializer(lectures, many=True)
     return Response(serializer.data)
@@ -244,6 +263,28 @@ def removeWishlist(request):
     try:
         wishlist = Wishlist.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
         wishlist.delete()
+        return Response(1)
+    except Exception:
+        return Response(0)
+
+
+@api_view(['POST'])
+def getCourseVisibleStatus(request):
+    try:
+        course = Entity.objects.get(Q(id=request.data['courseId']))
+        if course.is_visible:
+            return Response(1)
+        return Response(0)
+    except Exception:
+        return Response(0)
+
+
+@api_view(['POST'])
+def setCourseVisible(request):
+    try:
+        course = Entity.objects.get(Q(id=request.data['courseId']))
+        course.is_visible = request.data['isVisible']
+        course.save()
         return Response(1)
     except Exception:
         return Response(0)

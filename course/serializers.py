@@ -14,6 +14,7 @@ class CourseSerializer(serializers.ModelSerializer):
             "created_time",
             "owner",
             "genre",
+            "is_visible",
             "get_absolute_url",
             "get_image",
             "get_student_url",
@@ -65,5 +66,6 @@ class LectureSerializer(serializers.ModelSerializer):
             "title",
             "created_time",
             "format",
-            "course"
+            "course",
+            "get_absolute_url"
         )

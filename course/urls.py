@@ -4,14 +4,15 @@ from course import views
 
 urlpatterns = [
     path('getAllCourse/', views.AllCourse.as_view()),
+    path('getAllVisibleCourse/', views.AllVisibleCourse.as_view()),
     path('getAllRecomendedCourse/', views.AllRecomendedCourse.as_view()),
     path('getAllGenre/', views.AllGenre.as_view()),
     path('getAllSelection/', views.AllSelection.as_view()),
     path('getAllCollection/', views.AllCollection.as_view()),
-    path('courses/<slug:genre_slug>/<slug:course_slug>/', views.CourseDetail.as_view()),
+    path('course/<str:course_name>/', views.getCourseDetail),
     path('courses/<slug:genre_slug>/', views.GenreDetail.as_view()),
     path('getUserSelection/<str:user_id>/', views.getUserSelection),
-    path('getCourseLessons/<str:course_id>/', views.getCourseLessons),
+    path('getCourseLectures/<str:course_id>/', views.getCourseLectures),
     path('getUserWishlist/<str:user_id>/', views.getUserWishlist),
     path('getOwnerCourse/<str:user_id>/', views.getOwnerCourse),
     path('course_student/<slug:course_slug>/', views.SelectionUser.as_view()),
@@ -24,4 +25,6 @@ urlpatterns = [
     path('getWishlistStatus/', views.getWishlistStatus),
     path('addWishlist/', views.addWishlist),
     path('removeWishlist/', views.removeWishlist),
+    path('getCourseVisibleStatus/', views.getCourseVisibleStatus),
+    path('setCourseVisible/', views.setCourseVisible),
 ]
