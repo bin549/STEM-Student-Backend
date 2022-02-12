@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Entity, Genre, Selection, Wishlist, Lecture
-from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, WishlistSerializer, LectureSerializer
+from .models import Entity, Genre, Selection, Wishlist, Lecture, Format
+from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, WishlistSerializer, LectureSerializer, FormatSerializer
 from django.http import Http404
 from rest_framework.decorators import api_view
 from django.db.models import Q
@@ -9,6 +9,7 @@ from users.models import Profile
 from users.serializers import UserSerializer
 import datetime
 from rest_framework import status
+from homework.models import Assignment, Execution
 
 
 class AllCourse(APIView):
@@ -221,6 +222,14 @@ def registerCourse(request):
         new_selection.course = course
         new_selection.select_time = datetime.timedelta(days=30)
         new_selection.save()
+
+        homeworks = Assignment.objects.filter(Q(course=course.id))
+        for homework in homeworks:
+            execution = Execution()
+            execution.homework = homework
+            execution.user = user
+            execution.save()
+
     return Response('Register Success.')
 
 
@@ -288,3 +297,60 @@ def setCourseVisible(request):
         return Response(1)
     except Exception:
         return Response(0)
+
+@api_view(['POST'])
+def deleteCourseStudent(request):
+    try:
+        selection = Selection.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+    except Exception:
+        return Response('Selection Existed', status=status.HTTP_201_CREATED)
+    try:
+        homeworks = Assignment.objects.filter(Q(course=request.data['courseId']))
+        for homework in homeworks:
+            execution = Execution.objects.get(Q(user=request.data['userId']) & Q(homework=homework.id))
+            execution.delete()
+    except Exception:
+        return Response('Homework Not Existed', status=status.HTTP_201_CREATED)
+    selection.delete()
+    return Response(1)
+
+
+@api_view(['POST'])
+def addCourseStudent(request):
+    try:
+        course = Entity.objects.get(Q(id=request.data['courseId']))
+        user = Profile.objects.get(Q(id=request.data['userId']))
+    except Exception:
+        return Response('user Not Existed', status=status.HTTP_201_CREATED)
+    try:
+        Selection.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        return Response('Selection Existed', status=status.HTTP_201_CREATED)
+    except Exception:
+        selection = Selection()
+        selection.user = user
+        selection.course = course
+        selection.select_time = datetime.timedelta(days=30)
+        selection.save()
+        homeworks = Assignment.objects.filter(Q(course=course.id))
+        for homework in homeworks:
+            execution = Execution()
+            execution.homework = homework
+            execution.user = user
+            execution.save()
+        return Response(1)
+
+
+@api_view(['POST'])
+def addCourseLecture(request):
+    try:
+        course = Entity.objects.get(Q(id=request.data['courseId']))
+        format = Format.objects.get(Q(id=request.data['format']))
+    except Exception:
+        return Response('Format Not Existed', status=status.HTTP_201_CREATED)
+    lecture = Lecture()
+    lecture.title = request.data['title']
+    lecture.course = course
+    lecture.format = format
+    lecture.created_time = datetime.timedelta(days=30)
+    lecture.save()
+    return Response(1)

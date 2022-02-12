@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Entity, Genre, Selection, Wishlist, Lecture
+from .models import Entity, Genre, Selection, Wishlist, Lecture, Format
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -68,4 +68,13 @@ class LectureSerializer(serializers.ModelSerializer):
             "format",
             "course",
             "get_absolute_url"
+        )
+
+class FormatSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Format
+        fields = (
+            "id",
+            "name",
         )

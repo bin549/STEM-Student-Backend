@@ -19,9 +19,9 @@ class Assignment(models.Model):
 class Execution(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    score = models.IntegerField(default=1)
-    is_finish = models.BooleanField(default=False, null=True)
-    is_excellent = models.BooleanField(default=False, null=True)
+    score = models.IntegerField(null=True)
+    is_finish = models.BooleanField(default=False)
+    is_excellent = models.BooleanField(default=False)
     homework = models.ForeignKey(Assignment, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)
 
