@@ -5,7 +5,7 @@ from course import views
 urlpatterns = [
     path('getAllCourse/', views.AllCourse.as_view()),
     path('getAllVisibleCourse/', views.AllVisibleCourse.as_view()),
-    path('getAllRecomendedCourse/', views.AllRecomendedCourse.as_view()),
+    path('getRecomendedCourse/', views.getRecomendedCourse),
     path('getAllGenre/', views.AllGenre.as_view()),
     path('getAllSelection/', views.AllSelection.as_view()),
     path('getAllCollection/', views.AllCollection.as_view()),
@@ -30,4 +30,6 @@ urlpatterns = [
     path('addCourseStudent/', views.addCourseStudent),
     path('deleteCourseStudent/', views.deleteCourseStudent),
     path('addCourseLecture/', views.addCourseLecture),
+    path('getCourseByTypeAndPage/', views.getCourseByTypeAndPage),
+    path('getCoursesCount/', views.getCoursesCount),
 ]

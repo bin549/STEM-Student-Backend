@@ -10,6 +10,8 @@ from users.serializers import UserSerializer
 import datetime
 from rest_framework import status
 from homework.models import Assignment, Execution
+from .utils import paginateCourses
+import random
 
 
 class AllCourse(APIView):
@@ -27,13 +29,6 @@ class AllVisibleCourse(APIView):
         serializer = CourseSerializer(courses, many=True)
         return Response(serializer.data)
 
-
-class AllRecomendedCourse(APIView):
-
-    def get(self, request, format=None):
-        courses = Entity.objects.all()[0:4]
-        serializer = CourseSerializer(courses, many=True)
-        return Response(serializer.data)
 
 
 class AllGenre(APIView):
@@ -165,14 +160,15 @@ class SelectionUser(APIView):
 def createCourse(request):
     future_course = Entity()
     owner = Profile.objects.get(Q(id=request.data['ownerId']))
-    genre = Genre.objects.get(Q(id="869d268e-09f6-4177-96b4-585707e85545"))
+    genre = Genre.objects.get(Q(id="169d268e-09f6-4177-96b4-585707e85545"))
     future_course.owner = owner
     future_course.title = request.data['title']
     future_course.description = request.data['description']
-    future_course.slug = 3
-    future_course.cover_img = "profiles/project-1.jpg"
+    future_course.cover_img = "profiles/project-9.jpg"
     future_course.created_time = datetime.timedelta(days=30)
     future_course.genre = genre
+    future_course.serial_number = int(random.random()*1000000)
+    future_course.is_visible = True
     future_course.save()
     return Response('createCourse!')
 
@@ -222,14 +218,12 @@ def registerCourse(request):
         new_selection.course = course
         new_selection.select_time = datetime.timedelta(days=30)
         new_selection.save()
-
         homeworks = Assignment.objects.filter(Q(course=course.id))
         for homework in homeworks:
             execution = Execution()
             execution.homework = homework
             execution.user = user
             execution.save()
-
     return Response('Register Success.')
 
 
@@ -354,3 +348,39 @@ def addCourseLecture(request):
     lecture.created_time = datetime.timedelta(days=30)
     lecture.save()
     return Response(1)
+
+
+@api_view(['POST'])
+def getCourseByTypeAndPage(request):
+    try:
+        genre = Genre.objects.get(Q(name=request.data['genre']))
+        courses = Entity.objects.filter(Q(is_visible=True) & Q(genre=genre.id))
+    except Exception:
+        courses = Entity.objects.filter(Q(is_visible=True))
+    courses = paginateCourses(request, courses, request.data['pageSize'])
+    serializer = CourseSerializer(courses, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def getCoursesCount(request):
+    try:
+        genre = Genre.objects.get(Q(name=request.data['genre']))
+        courses = Entity.objects.filter(Q(is_visible=True) & Q(genre=genre.id))
+        return Response(len(courses))
+    except Exception:
+        courses = Entity.objects.filter(Q(is_visible=True))
+        return Response(len(courses))
+
+
+@api_view(['POST'])
+def getRecomendedCourse(request):
+    userId=request.data['userId']
+    if userId:
+        courses = Entity.objects.filter(Q(is_visible=True))
+    else:
+        courses = Entity.objects.filter(Q(is_visible=True))
+    serializer = CourseSerializer(courses, many=True)
+
+    courseData = serializer.data[0:request.data['recomendedCoursesCount']]
+    return Response(courseData)
