@@ -5,6 +5,7 @@ from .models import Assignment, Execution
 class HomeworkSerializer(serializers.ModelSerializer):
 
     class Meta:
+
         model = Assignment
         fields = (
             "id",
@@ -18,6 +19,7 @@ class HomeworkSerializer(serializers.ModelSerializer):
 class ExecutionSerializer(serializers.ModelSerializer):
 
     class Meta:
+
         model = Assignment
         fields = (
             "id",

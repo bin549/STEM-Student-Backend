@@ -377,10 +377,17 @@ def getCoursesCount(request):
 def getRecomendedCourse(request):
     userId=request.data['userId']
     if userId:
-        courses = Entity.objects.filter(Q(is_visible=True))
+        course_ids = set()
+        selections = Selection.objects.filter(Q(user=userId))
+        wishlists = Wishlist.objects.filter(Q(user=userId))
+        for e in selections:
+            course_ids.add(e.course.id)
+        for e in wishlists:
+            course_ids.add(e.course.id)
+        courses = Entity.objects.exclude(Q(id__in=course_ids))
     else:
         courses = Entity.objects.filter(Q(is_visible=True))
     serializer = CourseSerializer(courses, many=True)
-
-    courseData = serializer.data[0:request.data['recomendedCoursesCount']]
-    return Response(courseData)
+    courseData = serializer.data
+    random.shuffle(courseData)
+    return Response(courseData[0:request.data['recomendedCoursesCount']])

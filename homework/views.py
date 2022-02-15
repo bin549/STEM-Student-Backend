@@ -7,7 +7,7 @@ from django.db.models import Q
 from course.models import Entity, Selection
 from users.models import Profile
 import datetime
-
+ 
 
 class AllHomework(APIView):
 
