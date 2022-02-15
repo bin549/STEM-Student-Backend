@@ -12,6 +12,7 @@ from rest_framework import status
 from homework.models import Assignment, Execution
 from .utils import paginateCourses
 import random
+from django.core.files.storage import default_storage
 
 
 class AllCourse(APIView):
@@ -159,26 +160,21 @@ class SelectionUser(APIView):
 @api_view(['POST'])
 def createCourse(request):
     future_course = Entity()
-    owner = Profile.objects.get(Q(id=request.data['ownerId']))
-    genre = Genre.objects.get(Q(id="169d268e-09f6-4177-96b4-585707e85545"))
+    owner = Profile.objects.get(Q(id=request.data['userId']))
+    genre = Genre.objects.get(Q(name=request.data['genre']))
     future_course.owner = owner
     future_course.title = request.data['title']
     future_course.description = request.data['description']
-    future_course.cover_img = "profiles/project-9.jpg"
+    future_course.cover_img = request.data['cover_img']
     future_course.created_time = datetime.timedelta(days=30)
     future_course.genre = genre
     future_course.serial_number = int(random.random()*1000000)
-    future_course.is_visible = True
     future_course.save()
     return Response('createCourse!')
 
 
 @api_view(['POST'])
 def updateCourse(request, pk):
-    print(request.data)
-    print(request.data)
-    print(request.data)
-    print(request.data)
     return None
 
 
@@ -363,6 +359,22 @@ def getCourseByTypeAndPage(request):
 
 
 @api_view(['POST'])
+def getUserCoursesByTypeAndPage(request):
+    userId=request.data['userId']
+    selections = Selection.objects.filter(Q(user=userId))
+    course_ids = set()
+    for e in selections:
+        course_ids.add(e.course.id)
+    try:
+        genre = Genre.objects.get(Q(name=request.data['genre']))
+        courses = Entity.objects.filter(Q(genre=genre.id) & Q(id__in=course_ids))
+    except Exception:
+        courses = Entity.objects.filter(Q(id__in=course_ids))
+    serializer = CourseSerializer(courses, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
 def getCoursesCount(request):
     try:
         genre = Genre.objects.get(Q(name=request.data['genre']))
@@ -391,3 +403,26 @@ def getRecomendedCourse(request):
     courseData = serializer.data
     random.shuffle(courseData)
     return Response(courseData[0:request.data['recomendedCoursesCount']])
+
+
+
+@api_view(['POST'])
+def getMyCoursesCount(request):
+    userId=request.data['userId']
+    selections = Selection.objects.filter(Q(user=userId))
+    course_ids = set()
+    for e in selections:
+        course_ids.add(e.course.id)
+    try:
+        genre = Genre.objects.get(Q(name=request.data['genre']))
+        courses = Entity.objects.filter(Q(genre=genre.id) & Q(id__in=course_ids))
+    except Exception:
+        courses = Entity.objects.filter(Q(id__in=course_ids))
+    return Response(len(courses))
+
+
+@api_view(['POST'])
+def savefile(request):
+    file=request.FILES['file']
+    file_name=default_storage.save(file.name, file)
+    return Response(file.name)

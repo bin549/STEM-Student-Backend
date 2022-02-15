@@ -6,7 +6,7 @@ urlpatterns = [
     path('getAllCourse/', views.AllCourse.as_view()),
     path('getAllVisibleCourse/', views.AllVisibleCourse.as_view()),
     path('getRecomendedCourse/', views.getRecomendedCourse),
-    path('getAllGenre/', views.AllGenre.as_view()),
+    path('getAllGenres/', views.AllGenre.as_view()),
     path('getAllSelection/', views.AllSelection.as_view()),
     path('getAllCollection/', views.AllCollection.as_view()),
     path('course/<str:course_name>/', views.getCourseDetail),
@@ -32,4 +32,7 @@ urlpatterns = [
     path('addCourseLecture/', views.addCourseLecture),
     path('getCourseByTypeAndPage/', views.getCourseByTypeAndPage),
     path('getCoursesCount/', views.getCoursesCount),
+    path('getUserCoursesByTypeAndPage/', views.getUserCoursesByTypeAndPage),
+    path('getMyCoursesCount/', views.getMyCoursesCount),
+    path('savefile/', views.savefile),
 ]

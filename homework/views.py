@@ -7,7 +7,7 @@ from django.db.models import Q
 from course.models import Entity, Selection
 from users.models import Profile
 import datetime
- 
+
 
 class AllHomework(APIView):
 
@@ -65,14 +65,12 @@ def deleteHomework(request):
 def loadExecution(request):
     homeworkId = request.data['homeworkId']
     executions = Execution.objects.filter(Q(homework=homeworkId))
-
     userHomeworks = []
     for execution in executions:
         user = Profile.objects.get(Q(id=homework.user))
         userHomework = {'username': user.name, 'is_finish': execution.is_finish,
                         'is_excellent': execution.is_excellent, 'score': execution.score}
         userHomeworks.append(userHomework)
-
     return Response(1)
 
 
@@ -87,6 +85,5 @@ def loadHomeworks(request):
         execution = Execution.objects.get(Q(homework=homework.id) & Q(user=userId))
         userHomework = {'intro': homework.intro, 'start_time': homework.start_time, 'end_time': homework.end_time, 'score': execution.score, 'is_finish': execution.is_finish, 'is_excellent': execution.is_excellent}
         userHomeworks.append(userHomework)
-
 
     return Response(userHomeworks)
