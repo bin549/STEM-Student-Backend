@@ -10,6 +10,7 @@ class HomeworkSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "intro",
+            "description",
             "start_time",
             "end_time",
             "course",
@@ -20,11 +21,11 @@ class ExecutionSerializer(serializers.ModelSerializer):
 
     class Meta:
 
-        model = Assignment
+        model = Execution
         fields = (
             "id",
             "score",
-            "is_finish",
+            "finish_time",
             "is_excellent",
             "homework",
             "user"
