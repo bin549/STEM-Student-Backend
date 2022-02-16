@@ -9,3 +9,4 @@ urlpatterns = [
     path('loadHomeworks/', views.loadHomeworks),
     path('deleteHomework/', views.deleteHomework),
 ]
+ 

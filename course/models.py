@@ -76,6 +76,7 @@ class Lecture(models.Model):
     index = models.IntegerField(default=1)
     title = models.CharField(max_length=200)
     created_time = models.DateTimeField(auto_now_add=True)
+    media = models.ImageField(null=True, blank=True, upload_to='profiles/', default="profiles/about-us-video.mp4")
     format = models.ForeignKey(Format, null=True, blank=True, on_delete=models.CASCADE)
     course = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
 
@@ -84,3 +85,8 @@ class Lecture(models.Model):
 
     def get_absolute_url(self):
         return f'/course/{self.course.title}/learn/{self.id}/'
+
+    def get_media(self):
+        if self.media:
+            return 'http://127.0.0.1:8000' + self.media.url
+        return ''

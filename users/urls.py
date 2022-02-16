@@ -9,4 +9,12 @@ urlpatterns = [
     path('getUsersByTypeName/<str:type_name>/', views.getUsersByTypeName),
     path('getUsersByTypeName/<str:type_name>/', views.getUsersByTypeName),
     path('addUser/', views.addUser),
+    path('createMessage/', views.createMessage),
+    path('getInboxUnreadCount/', views.getInboxUnreadCount),
+    path('getMessages/', views.getMessages),
+    path('getMessage/<str:message_id>/', views.getMessage),
+    path('SetMessageIsReadStatus/<str:message_id>/', views.SetMessageIsReadStatus),
+    path('deleteMessage/<str:message_id>/', views.deleteMessage),
+    path('getUserNameById/<str:user_id>/', views.getUserNameById),
+
 ]

@@ -43,7 +43,7 @@ class Profile(models.Model):
         return ''
 
 
-class Notification(models.Model):
+class Message(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     sender = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True)

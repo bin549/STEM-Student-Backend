@@ -67,7 +67,8 @@ class LectureSerializer(serializers.ModelSerializer):
             "created_time",
             "format",
             "course",
-            "get_absolute_url"
+            "get_absolute_url",
+            "get_media"
         )
 
 class FormatSerializer(serializers.ModelSerializer):

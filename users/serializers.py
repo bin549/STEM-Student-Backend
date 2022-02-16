@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Profile, Type
+from .models import Profile, Type, Message
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -24,8 +24,23 @@ class UserSerializer(serializers.ModelSerializer):
 class TypeSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = Profile
+        model = Type
         fields = (
             "id",
             "name",
+        )
+
+
+class MessageSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Message
+        fields = (
+            "id",
+            "sender",
+            "recipient",
+            "title",
+            "content",
+            "is_read",
+            "created_time",
         )
