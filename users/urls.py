@@ -16,5 +16,7 @@ urlpatterns = [
     path('SetMessageIsReadStatus/<str:message_id>/', views.SetMessageIsReadStatus),
     path('deleteMessage/<str:message_id>/', views.deleteMessage),
     path('getUserNameById/<str:user_id>/', views.getUserNameById),
+    path('getUserById/<str:user_id>/', views.getUserById),
+    path('updateUser/', views.updateUser),
 
 ]

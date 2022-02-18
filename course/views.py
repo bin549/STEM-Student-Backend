@@ -114,6 +114,14 @@ def getCourseLectures(request, course_id):
 
 
 @api_view(['GET'])
+def getCourseOwner(request, course_id):
+    course = Entity.objects.get(Q(id=course_id))
+    owner = Profile.objects.get(id=course.owner.id)
+    serializer = UserSerializer(owner, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
 def getUserWishlist(request, user_id):
     collections = Wishlist.objects.filter(Q(user=user_id))
     courses = []
@@ -130,6 +138,19 @@ def getOwnerCourse(request, user_id):
     serializer = CourseSerializer(courses, many=True)
     return Response(serializer.data)
 
+
+@api_view(['GET'])
+def getCourse(request, course_id):
+    courses = Entity.objects.get(Q(id=course_id))
+    serializer = CourseSerializer(courses, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getCourseGenre(request, genre_id):
+    genre = Genre.objects.get(Q(id=genre_id))
+    serializer = GenreSerializer(courses, many=False)
+    return Response(serializer.data)
 
 class CourseDetail(APIView):
 
@@ -181,6 +202,12 @@ def updateCourse(request, pk):
 @api_view(['POST'])
 def deleteCourse(request):
     course = Entity.objects.get(Q(id=request.data['courseId']))
+    selections = Selection.objects.filter(Q(course=course.id))
+    wishlists = Wishlist.objects.filter(Q(course=course.id))
+    lectures = Lecture.objects.filter(Q(course=course.id))
+    selections.delete()
+    wishlists.delete()
+    lectures.delete()
     course.delete()
     return Response('Tag was deleted!')
 
@@ -397,6 +424,7 @@ def getRecomendedCourse(request):
         for e in wishlists:
             course_ids.add(e.course.id)
         courses = Entity.objects.exclude(Q(id__in=course_ids))
+        courses = courses.filter(Q(is_visible=True))
     else:
         courses = Entity.objects.filter(Q(is_visible=True))
     serializer = CourseSerializer(courses, many=True)

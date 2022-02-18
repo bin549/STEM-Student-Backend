@@ -25,6 +25,13 @@ def getUserInfo(request, pk):
 
 
 @api_view(['GET'])
+def getUserById(request, user_id):
+    profile = Profile.objects.get(id=user_id)
+    serializer = UserSerializer(profile, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
 def getUserNameById(request, user_id):
     profile = Profile.objects.get(id=user_id)
     serializer = UserSerializer(profile, many=False)
@@ -54,6 +61,13 @@ def addUser(request):
     print(request.data)
     return Response(1)
 
+
+@api_view(['POST'])
+def updateUser(request):
+    user = Profile.objects.get(id=request.data['userId'])
+    user.profile_image = request.data['profile_image']
+    user.save()
+    return Response(1)
 
 @api_view(['POST'])
 def createMessage(request):

@@ -35,4 +35,7 @@ urlpatterns = [
     path('getUserCoursesByTypeAndPage/', views.getUserCoursesByTypeAndPage),
     path('getMyCoursesCount/', views.getMyCoursesCount),
     path('savefile/', views.savefile),
+    path('getCourseOwner/<str:course_id>/', views.getCourseOwner),
+    path('getCourse/<str:course_id>/', views.getCourse),
+    path('getCourseGenre/<str:genre_id>/', views.getCourseGenre),
 ]
