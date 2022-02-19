@@ -11,6 +11,7 @@ urlpatterns = [
     path('addUser/', views.addUser),
     path('createMessage/', views.createMessage),
     path('getInboxUnreadCount/', views.getInboxUnreadCount),
+    path('getInboxReadCount/', views.getInboxReadCount),
     path('getMessages/', views.getMessages),
     path('getMessage/<str:message_id>/', views.getMessage),
     path('SetMessageIsReadStatus/<str:message_id>/', views.SetMessageIsReadStatus),

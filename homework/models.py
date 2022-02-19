@@ -21,7 +21,7 @@ class Execution(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     score = models.IntegerField(null=True)
-    finish_time = models.DateTimeField(auto_now_add=True, null=True)
+    finish_time = models.DateTimeField(null=True)
     is_excellent = models.BooleanField(default=False)
     homework = models.ForeignKey(Assignment, on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(Profile, on_delete=models.CASCADE, null=True, blank=True)

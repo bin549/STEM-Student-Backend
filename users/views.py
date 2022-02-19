@@ -94,6 +94,13 @@ def getInboxUnreadCount(request):
 
 
 @api_view(['POST'])
+def getInboxReadCount(request):
+    user = Profile.objects.get(name=request.data['user'])
+    messages = Message.objects.filter(Q(recipient=user.id) & Q(is_read=True))
+    return Response(messages.count())
+
+
+@api_view(['POST'])
 def getMessages(request):
     user = Profile.objects.get(name=request.data['user'])
     if request.data['is_read'] == None:

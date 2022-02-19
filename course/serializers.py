@@ -65,8 +65,10 @@ class LectureSerializer(serializers.ModelSerializer):
             "index",
             "title",
             "created_time",
+            "media",
             "format",
             "course",
+            "is_preview",
             "get_absolute_url",
             "get_media"
         )

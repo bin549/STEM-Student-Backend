@@ -149,8 +149,9 @@ def getCourse(request, course_id):
 @api_view(['GET'])
 def getCourseGenre(request, genre_id):
     genre = Genre.objects.get(Q(id=genre_id))
-    serializer = GenreSerializer(courses, many=False)
+    serializer = GenreSerializer(genre, many=False)
     return Response(serializer.data)
+
 
 class CourseDetail(APIView):
 
@@ -209,7 +210,35 @@ def deleteCourse(request):
     wishlists.delete()
     lectures.delete()
     course.delete()
-    return Response('Tag was deleted!')
+    return Response('Course was deleted!')
+
+
+@api_view(['POST'])
+def deleteLecture(request):
+    lecture = Lecture.objects.get(Q(id=request.data['lectureId']))
+    lecture.delete()
+    return Response('lecture was deleted!')
+
+
+@api_view(['POST'])
+def setPreviewLecture(request):
+    lecture = Lecture.objects.get(Q(id=request.data['lectureId']))
+    course = Entity.objects.get(Q(id=lecture.course.id))
+    courseLecture  = Lecture.objects.get(Q(is_preview=True) & Q(course=course.id))
+    courseLecture.is_preview = False
+    courseLecture.save()
+    lecture.is_preview = True
+    lecture.save()
+    return Response('Set was success!')
+
+
+
+@api_view(['POST'])
+def getPreviewLectureByCourseId(request, course_id):
+    lectures = Lecture.objects.filter(Q(course=course_id))
+    lecture = lectures.get(Q(is_preview=True))
+    serializer = LectureSerializer(lecture, many=False)
+    return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -361,13 +390,21 @@ def addCourseStudent(request):
 def addCourseLecture(request):
     try:
         course = Entity.objects.get(Q(id=request.data['courseId']))
-        format = Format.objects.get(Q(id=request.data['format']))
     except Exception:
         return Response('Format Not Existed', status=status.HTTP_201_CREATED)
+    fileName = request.data['fileName']
+    photo_format=('png', 'jpg', 'bmp', 'gif')
+    video_format=('mp4')
+    if fileName.split('.')[-1].lower() in photo_format:
+        format = Format.objects.get(Q(name='Photo'))
+    elif fileName.split('.')[-1].lower() in video_format:
+        format = Format.objects.get(Q(name='Video'))
+    print(format)
     lecture = Lecture()
     lecture.title = request.data['title']
     lecture.course = course
     lecture.format = format
+    lecture.media = fileName
     lecture.created_time = datetime.timedelta(days=30)
     lecture.save()
     return Response(1)
@@ -454,3 +491,18 @@ def savefile(request):
     file=request.FILES['file']
     file_name=default_storage.save(file.name, file)
     return Response(file.name)
+
+
+@api_view(['POST'])
+def getCourseLecture(request):
+    lectures = Lecture.objects.filter(Q(course=request.data['course_id']))
+    lecture = lectures.get(Q(title=request.data['lecture_name']))
+    serializer = LectureSerializer(lecture, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getLectureFormat(request, format_id):
+    format = Format.objects.get(Q(id=format_id))
+    serializer = FormatSerializer(format, many=False)
+    return Response(serializer.data)

@@ -78,6 +78,7 @@ class Lecture(models.Model):
     created_time = models.DateTimeField(auto_now_add=True)
     media = models.ImageField(null=True, blank=True, upload_to='profiles/', default="profiles/about-us-video.mp4")
     format = models.ForeignKey(Format, null=True, blank=True, on_delete=models.CASCADE)
+    is_preview = models.BooleanField(default=False, null=True)
     course = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
