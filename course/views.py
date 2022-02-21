@@ -196,8 +196,16 @@ def createCourse(request):
 
 
 @api_view(['POST'])
-def updateCourse(request, pk):
-    return None
+def updateCourse(request):
+
+    request.data['genre']
+    course = Entity.objects.get(id=request.data['course_id'])
+    course.title = request.data['title']
+    course.cover_img = request.data['cover_img']
+    course.title = request.data['title']
+    course.description = request.data['description']
+    course.save()
+    return Response('updateCourse!')
 
 
 @api_view(['POST'])
@@ -224,9 +232,12 @@ def deleteLecture(request):
 def setPreviewLecture(request):
     lecture = Lecture.objects.get(Q(id=request.data['lectureId']))
     course = Entity.objects.get(Q(id=lecture.course.id))
-    courseLecture  = Lecture.objects.get(Q(is_preview=True) & Q(course=course.id))
-    courseLecture.is_preview = False
-    courseLecture.save()
+    try:
+        courseLecture  = Lecture.objects.get(Q(is_preview=True) & Q(course=course.id))
+        courseLecture.is_preview = False
+        courseLecture.save()
+    except Exception:
+        pass
     lecture.is_preview = True
     lecture.save()
     return Response('Set was success!')

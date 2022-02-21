@@ -17,7 +17,7 @@ urlpatterns = [
     path('getOwnerCourse/<str:user_id>/', views.getOwnerCourse),
     path('course_student/<slug:course_slug>/', views.SelectionUser.as_view()),
     path('createCourse/', views.createCourse),
-    path('updateCourse/<str:pk>/', views.updateCourse),
+    path('updateCourse/', views.updateCourse),
     path('deleteCourse/', views.deleteCourse),
     path('getSerialNumber/', views.getSerialNumber),
     path('registerCourse/', views.registerCourse),
