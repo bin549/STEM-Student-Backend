@@ -26,6 +26,7 @@ INSTALLED_APPS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
+    "http://120.24.244.124:8080"
 ]
 
 MIDDLEWARE = [
@@ -65,7 +66,7 @@ DATABASES = {
         'NAME': 'stem',
         'USER': "postgres",
         'PASSWORD': "__2018bb",
-        'HOST': "localhost",
+        'HOST': "120.24.244.124",
         'PORT': '5432',
     }
 }
