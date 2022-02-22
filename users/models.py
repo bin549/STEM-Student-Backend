@@ -39,7 +39,7 @@ class Profile(models.Model):
 
     def get_image(self):
         if self.profile_image:
-            return 'http://127.0.0.1:8000' + self.profile_image.url
+            return 'http://120.24.244.124:8000' + self.profile_image.url
         return ''
 
 

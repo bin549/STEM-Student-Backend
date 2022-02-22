@@ -32,7 +32,7 @@ class Entity(models.Model):
 
     def get_image(self):
         if self.cover_img:
-            return 'http://127.0.0.1:8000' + self.cover_img.url
+            return 'http://120.24.244.124:8000' + self.cover_img.url
         return ''
 
     def get_student_url(self):
@@ -89,5 +89,5 @@ class Lecture(models.Model):
 
     def get_media(self):
         if self.media:
-            return 'http://127.0.0.1:8000' + self.media.url
+            return 'http://120.24.244.124:8000' + self.media.url
         return ''
