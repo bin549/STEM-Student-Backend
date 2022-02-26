@@ -42,5 +42,5 @@ urlpatterns = [
     path('setPreviewLecture/', views.setPreviewLecture),
     path('getPreviewLectureByCourseId/<str:course_id>/', views.getPreviewLectureByCourseId),
     path('getCourseLecture/', views.getCourseLecture),
-    path('getLectureFormat/<str:format_id>/', views.getLectureFormat), 
+    path('getLectureFormat/<str:format_id>/', views.getLectureFormat),
 ]
