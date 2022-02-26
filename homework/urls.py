@@ -18,3 +18,4 @@ urlpatterns = [
     path('uploadHomework/', views.uploadHomework),
     path('loadExecution/', views.loadExecution),
 ]
+ 
