@@ -1,12 +1,15 @@
 from pathlib import Path
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-3ufbu_fctt-@c3@%5r&nns3@0m8=&g*7$f!6-&ry$own9=k145'
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = int(os.environ.get("DEBUG", default=0))
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
-DEBUG = True
-
-ALLOWED_HOSTS = ["120.24.244.124"]
+#SECRET_KEY = 'django-insecure-3ufbu_fctt-@c3@%5r&nns3@0m8=&g*7$f!6-&ry$own9=k145'
+#DEBUG = True
+#ALLOWED_HOSTS = ["120.24.244.124"]
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -26,7 +29,8 @@ INSTALLED_APPS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8080",
-    "http://120.24.244.124:8080"
+    "http://120.24.244.124:8080",
+    "http://120.24.244.124:8081"
 ]
 
 MIDDLEWARE = [
