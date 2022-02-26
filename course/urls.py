@@ -31,7 +31,7 @@ urlpatterns = [
     path('deleteCourseStudent/', views.deleteCourseStudent),
     path('addCourseLecture/', views.addCourseLecture),
     path('getCourseByTypeAndPage/', views.getCourseByTypeAndPage),
-    path('getCoursesCount/', views.getCoursesCount), 
+    path('getCoursesCount/', views.getCoursesCount),
     path('getUserCoursesByTypeAndPage/', views.getUserCoursesByTypeAndPage),
     path('getMyCoursesCount/', views.getMyCoursesCount),
     path('savefile/', views.savefile),
@@ -42,5 +42,5 @@ urlpatterns = [
     path('setPreviewLecture/', views.setPreviewLecture),
     path('getPreviewLectureByCourseId/<str:course_id>/', views.getPreviewLectureByCourseId),
     path('getCourseLecture/', views.getCourseLecture),
-    path('getLectureFormat/<str:format_id>/', views.getLectureFormat),
+    path('getLectureFormat/<str:format_id>/', views.getLectureFormat), 
 ]
