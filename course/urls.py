@@ -29,7 +29,7 @@ urlpatterns = [
     path('setCourseVisible/', views.setCourseVisible),
     path('addCourseStudent/', views.addCourseStudent),
     path('deleteCourseStudent/', views.deleteCourseStudent),
-    path('addCourseLecture/', views.addCourseLecture),
+    path('addCourseLecture/', views.addCourseLecture), 
     path('getCourseByTypeAndPage/', views.getCourseByTypeAndPage),
     path('getCoursesCount/', views.getCoursesCount),
     path('getUserCoursesByTypeAndPage/', views.getUserCoursesByTypeAndPage),
