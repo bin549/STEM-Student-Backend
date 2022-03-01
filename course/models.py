@@ -33,7 +33,7 @@ class Entity(models.Model):
 
     def get_image(self):
         if self.cover_img:
-            return os.environ.get(BASEURL) + self.cover_img.url
+            return os.environ.get("BASEURL") + self.cover_img.url
         return ''
 
     def get_student_url(self):
@@ -90,5 +90,5 @@ class Lecture(models.Model):
 
     def get_media(self):
         if self.media:
-            return os.environ.get(BASEURL) + self.media.url
+            return os.environ.get("BASEURL") + self.media.url
         return ''

@@ -40,7 +40,7 @@ class Profile(models.Model):
 
     def get_image(self):
         if self.profile_image:
-            return os.environ.get(BASEURL) + self.profile_image.url
+            return os.environ.get("BASEURL") + self.profile_image.url
         return ''
 
 
