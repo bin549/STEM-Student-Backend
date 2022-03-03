@@ -405,7 +405,7 @@ def addCourseLecture(request):
         return Response('Format Not Existed', status=status.HTTP_201_CREATED)
     fileName = request.data['fileName']
     photo_format=('png', 'jpg', 'bmp', 'gif')
-    video_format=('mp4')
+    video_format=('mp4', 'mov')
     if fileName.split('.')[-1].lower() in photo_format:
         format = Format.objects.get(Q(name='Photo'))
     elif fileName.split('.')[-1].lower() in video_format:

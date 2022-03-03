@@ -9,4 +9,3 @@ def savefile(request):
     file=request.FILES['file']
     file_name=default_storage.save(file.name, file)
     return Response(file.name)
- 

@@ -23,7 +23,6 @@ def getUserInfo(request, pk):
     return Response(serializer.data)
 
 
-
 @api_view(['GET'])
 def getUserById(request, user_id):
     profile = Profile.objects.get(id=user_id)
@@ -79,7 +78,6 @@ def createMessage(request):
     message.created_time = datetime.timedelta(days=30)
     user_type = Type.objects.get(name='manager')
     recipients = Profile.objects.filter(user_type=user_type.id)
-
     for recipient in recipients:
         message.recipient = recipient
         message.save()
