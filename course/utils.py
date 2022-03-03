@@ -21,4 +21,3 @@ def paginateCourses(request, courses, results):
         rightIndex = paginator.num_pages + 1
     custom_range = range(leftIndex, rightIndex)
     return courses
- 

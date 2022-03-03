@@ -31,7 +31,6 @@ class AllVisibleCourse(APIView):
         return Response(serializer.data)
 
 
-
 class AllGenre(APIView):
 
     def get(self, request, format=None):
@@ -355,6 +354,7 @@ def setCourseVisible(request):
     except Exception:
         return Response(0)
 
+
 @api_view(['POST'])
 def deleteCourseStudent(request):
     try:
@@ -481,7 +481,6 @@ def getRecomendedCourse(request):
     return Response(courseData[0:request.data['recomendedCoursesCount']])
 
 
-
 @api_view(['POST'])
 def getMyCoursesCount(request):
     userId=request.data['userId']
@@ -495,13 +494,6 @@ def getMyCoursesCount(request):
     except Exception:
         courses = Entity.objects.filter(Q(id__in=course_ids))
     return Response(len(courses))
-
-
-@api_view(['POST'])
-def savefile(request):
-    file=request.FILES['file']
-    file_name=default_storage.save(file.name, file)
-    return Response(file.name)
 
 
 @api_view(['POST'])
