@@ -20,4 +20,3 @@ urlpatterns = [
     path('getUserById/<str:user_id>/', views.getUserById),
     path('updateUser/', views.updateUser),
 ]
- 

@@ -17,4 +17,7 @@ urlpatterns = [
     path('getHomeworkById/<str:homework_id>/', views.getHomeworkById),
     path('uploadHomework/', views.uploadHomework),
     path('loadExecution/', views.loadExecution),
+    path('getUnfinishHomework/<str:user_id>/', views.getUnfinishHomework),
+    path('loadCourseAllHomeworks/', views.loadCourseAllHomeworks),
+    path('loadCourseUnfinishHomeworks/', views.loadCourseUnfinishHomeworks),
 ]
