@@ -14,7 +14,7 @@ class AllUsers(APIView):
         profiles = Profile.objects.all()[0:4]
         serializer = UserSerializer(profiles, many=True)
         return Response(serializer.data)
-
+ 
 
 @api_view(['GET'])
 def getUserInfo(request, pk):
