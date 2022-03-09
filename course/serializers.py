@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Entity, Genre, Selection, Wishlist, Lecture, Format
+from .models import Entity, Genre, Selection, Wishlist, Lecture, Format, Comment
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -80,4 +80,18 @@ class FormatSerializer(serializers.ModelSerializer):
         fields = (
             "id",
             "name",
+        )
+
+
+
+class CommentSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Comment
+        fields = (
+            "id",
+            "user",
+            "lecture",
+            "content",
+            "comment_time",
         )

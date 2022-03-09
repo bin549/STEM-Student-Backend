@@ -1,7 +1,7 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Entity, Genre, Selection, Wishlist, Lecture, Format
-from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, WishlistSerializer, LectureSerializer, FormatSerializer
+from .models import Entity, Genre, Selection, Wishlist, Lecture, Format, Comment
+from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, WishlistSerializer, LectureSerializer, FormatSerializer, CommentSerializer
 from django.http import Http404
 from rest_framework.decorators import api_view
 from django.db.models import Q
@@ -13,6 +13,19 @@ from homework.models import Assignment, Execution
 from .utils import paginateCourses
 import random
 from django.core.files.storage import default_storage
+
+
+@api_view(['POST'])
+def createLectureComment(request):
+    user = Profile.objects.get(Q(id=request.data['userId']))
+    lecture = Lecture.objects.get(Q(id=request.data['lectureId']))
+    future_comment = Comment()
+    future_comment.user = user
+    future_comment.lecture = lecture
+    future_comment.content = request.data['content']
+    future_comment.comment_time = datetime.timedelta(days=30)
+    future_comment.save()
+    return Response('createCourse!')
 
 
 class AllCourse(APIView):
@@ -63,7 +76,6 @@ def getCourseDetail(request, course_name):
         return Response(serializer.data)
     except Entity.DoesNotExist:
         raise Http404
-
 
 
 class CourseDetail(APIView):
@@ -255,6 +267,13 @@ def getPreviewLectureByCourseId(request, course_id):
 def getSerialNumber(request):
     courses = Entity.objects.filter(Q(owner=user_id))
     serializer = CourseSerializer(courses, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getLectureComments(request, lecture_id):
+    comments = Comment.objects.filter(Q(lecture=lecture_id))
+    serializer = CommentSerializer(comments, many=True)
     return Response(serializer.data)
 
 
@@ -508,4 +527,11 @@ def getCourseLecture(request):
 def getLectureFormat(request, format_id):
     format = Format.objects.get(Q(id=format_id))
     serializer = FormatSerializer(format, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def loadCurrentSelectCourseTitle(request, course_id):
+    course = Entity.objects.get(Q(id=course_id))
+    serializer = CourseSerializer(course, many=False)
     return Response(serializer.data)

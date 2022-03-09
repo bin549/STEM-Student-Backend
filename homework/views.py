@@ -74,6 +74,15 @@ def loadExecution(request):
         userHomeworks.append(userHomework)
     return Response(1)
 
+@api_view(['POST'])
+def loadUserExecution(request):
+    userId = request.data['userId']
+    homeworkId = request.data['homeworkId']
+    execution = Execution.objects.get(Q(homework=homework.id) & Q(user=userId))
+    serializer = ExecutionSerializer(execution, many=False)
+    return Response(serializer.data)
+
+
 
 @api_view(['POST'])
 def loadHomeworks(request):

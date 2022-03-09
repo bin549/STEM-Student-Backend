@@ -42,4 +42,7 @@ urlpatterns = [
     path('getPreviewLectureByCourseId/<str:course_id>/', views.getPreviewLectureByCourseId),
     path('getCourseLecture/', views.getCourseLecture),
     path('getLectureFormat/<str:format_id>/', views.getLectureFormat),
+    path('loadCurrentSelectCourseTitle/<str:course_id>/', views.loadCurrentSelectCourseTitle),
+    path('createLectureComment/', views.createLectureComment),
+    path('getLectureComments/<str:lecture_id>/', views.getLectureComments),
 ]
