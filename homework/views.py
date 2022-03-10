@@ -84,21 +84,6 @@ def loadUserExecution(request):
 
 
 
-@api_view(['POST'])
-def loadHomeworks(request):
-    userId = request.data['userId']
-    courseId = request.data['courseId']
-    homeworks = Assignment.objects.filter(Q(course=courseId))
-    userHomeworks = []
-    for homework in homeworks:
-        execution = Execution.objects.get(Q(homework=homework.id) & Q(user=userId))
-        userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
-                         'end_time': homework.end_time, 'score': execution.score,
-                         'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
-        userHomeworks.append(userHomework)
-    return Response(userHomeworks)
-
-
 
 @api_view(['GET'])
 def getExecutionsById(request, homework_id):
@@ -195,19 +180,72 @@ def loadExecution(request):
     serializer = ExecutionSerializer(execution, many=False)
     return Response(serializer.data)
 
+
+@api_view(['POST'])
+def loadHomeworks(request):
+    userId = request.data['userId']
+    courseId = request.data['courseId']
+    homeworks = Assignment.objects.filter(Q(course=courseId))
+    userHomeworks = []
+    for homework in homeworks:
+        execution = Execution.objects.get(Q(homework=homework.id) & Q(user=userId))
+        userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
+                         'end_time': homework.end_time, 'score': execution.score,
+                         'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
+        userHomeworks.append(userHomework)
+    return Response(userHomeworks)
+
+
 @api_view(['POST'])
 def loadCourseAllHomeworks(request):
     executions = Execution.objects.filter(Q(user=request.data['userId']))
     # executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
-    homeworks = []
+    userHomeworks = []
     for execution in executions:
         try:
             homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
-            serializer = HomeworkSerializer(homework, many=False)
-            homeworks.append(serializer.data)
+            userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
+                 'end_time': homework.end_time, 'score': execution.score,
+                 'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
+            userHomeworks.append(userHomework)
         except Exception:
             pass
-    return Response(homeworks)
+    return Response(userHomeworks)
+
+
+
+@api_view(['POST'])
+def loadCourseUnfinishHomeworks(request):
+    executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(finish_time=None))
+    # executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+    userHomeworks = []
+    for execution in executions:
+        try:
+            homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+            userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
+                 'end_time': homework.end_time, 'score': execution.score,
+                 'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
+            userHomeworks.append(userHomework)
+        except Exception:
+            pass
+    return Response(userHomeworks)
+
+@api_view(['POST'])
+def loadCourseFinishHomeworks(request):
+    executions = Execution.objects.filter(Q(user=request.data['userId']))
+    executions = executions.exclude(Q(finish_time=None))
+    # executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+    userHomeworks = []
+    for execution in executions:
+        try:
+            homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+            userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
+                 'end_time': homework.end_time, 'score': execution.score,
+                 'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
+            userHomeworks.append(userHomework)
+        except Exception:
+            pass
+    return Response(userHomeworks)
 
 
 @api_view(['GET'])
@@ -218,34 +256,4 @@ def getUnfinishHomework(request, user_id):
         homework = Assignment.objects.get(Q(id=execution.homework.id))
         serializer = HomeworkSerializer(homework, many=False)
         homeworks.append(serializer.data)
-    return Response(homeworks)
-
-
-@api_view(['POST'])
-def loadCourseUnfinishHomeworks(request):
-    executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(finish_time=None))
-    # executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
-    homeworks = []
-    for execution in executions:
-        try:
-            homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
-            serializer = HomeworkSerializer(homework, many=False)
-            homeworks.append(serializer.data)
-        except Exception:
-            pass
-    return Response(homeworks)
-
-@api_view(['POST'])
-def loadCourseFinishHomeworks(request):
-    executions = Execution.objects.filter(Q(user=request.data['userId']))
-    executions = executions.exclude(Q(finish_time=None))
-    # executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
-    homeworks = []
-    for execution in executions:
-        try:
-            homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
-            serializer = HomeworkSerializer(homework, many=False)
-            homeworks.append(serializer.data)
-        except Exception:
-            pass
     return Response(homeworks)
