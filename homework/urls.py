@@ -20,5 +20,6 @@ urlpatterns = [
     path('getUnfinishHomework/<str:user_id>/', views.getUnfinishHomework),
     path('loadCourseAllHomeworks/', views.loadCourseAllHomeworks),
     path('loadCourseUnfinishHomeworks/', views.loadCourseUnfinishHomeworks),
+    path('loadCourseFinishHomeworks/', views.loadCourseFinishHomeworks),
     path('loadUserExecution/', views.loadUserExecution),
 ]

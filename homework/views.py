@@ -234,3 +234,18 @@ def loadCourseUnfinishHomeworks(request):
         except Exception:
             pass
     return Response(homeworks)
+
+@api_view(['POST'])
+def loadCourseFinishHomeworks(request):
+    executions = Execution.objects.filter(Q(user=request.data['userId']))
+    executions = executions.exclude(Q(finish_time=None))
+    # executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+    homeworks = []
+    for execution in executions:
+        try:
+            homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+            serializer = HomeworkSerializer(homework, many=False)
+            homeworks.append(serializer.data)
+        except Exception:
+            pass
+    return Response(homeworks)
