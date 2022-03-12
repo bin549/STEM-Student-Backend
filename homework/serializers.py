@@ -27,6 +27,9 @@ class ExecutionSerializer(serializers.ModelSerializer):
             "score",
             "finish_time",
             "is_excellent",
+            "content_text",
+            "content_media",
             "homework",
-            "user"
+            "user",
+            "get_media"
         )

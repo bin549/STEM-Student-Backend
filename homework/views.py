@@ -170,6 +170,8 @@ def getHomeworkById(request, homework_id):
 def uploadHomework(request):
     execution = Execution.objects.get(Q(homework=request.data['homeworkId']) & Q(user=request.data['userId']))
     execution.finish_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    execution.content_text = request.data['contentText']
+    execution.content_media = request.data['contentMedia']
     execution.save()
     return Response(1)
 
