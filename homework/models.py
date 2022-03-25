@@ -1,8 +1,8 @@
 import uuid
-from django.db import models
-from course.models import Entity
-from users.models import Profile
 import os
+from course.models import Entity
+from django.db import models
+from users.models import Profile
 
 
 class Assignment(models.Model):
@@ -34,5 +34,5 @@ class Execution(models.Model):
 
     def get_media(self):
         if self.content_media:
-            return os.environ.get("BASEURL") + self.content_media.url
+            return self.content_media.url
         return ''

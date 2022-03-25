@@ -5,6 +5,7 @@ from .models import Profile, Type, Message
 class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
+
         model = Profile
         fields = (
             "id",
@@ -24,6 +25,7 @@ class UserSerializer(serializers.ModelSerializer):
 class TypeSerializer(serializers.ModelSerializer):
 
     class Meta:
+
         model = Type
         fields = (
             "id",
@@ -34,6 +36,7 @@ class TypeSerializer(serializers.ModelSerializer):
 class MessageSerializer(serializers.ModelSerializer):
 
     class Meta:
+
         model = Message
         fields = (
             "id",

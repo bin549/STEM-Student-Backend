@@ -1,8 +1,8 @@
-from pathlib import Path
 import os
+from pathlib import Path
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = int(os.environ.get("DEBUG", default=0))
 ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
@@ -25,6 +25,8 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'course.apps.CourseConfig',
     'homework.apps.HomeworkConfig',
+    'upload.apps.UploadConfig',
+    'django_oss_storage',
 ]
 
 CORS_ALLOWED_ORIGINS = [
@@ -71,7 +73,7 @@ DATABASES = {
         'NAME': 'stem',
         'USER': "postgres",
         'PASSWORD': "__2018bb",
-        'HOST': "120.24.244.124",
+        'HOST': "127.0.0.1",
         'PORT': '5432',
     }
 }
@@ -92,15 +94,16 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 LANGUAGE_CODE = 'en-us'
-
 TIME_ZONE = 'UTC'
-
 USE_I18N = True
-
 USE_TZ = True
 
-STATIC_URL = '/static/'
-MEDIA_URL = 'media/profiles/'
-MEDIA_ROOT = BASE_DIR / 'media/'
+DEFAULT_FILE_STORAGE = 'django_oss_storage.backends.OssMediaStorage'
+OSS_ACCESS_KEY_ID = os.environ.get('OSS_ACCESS_KEY_ID','')
+OSS_ACCESS_KEY_SECRET = os.environ.get('OSS_ACCESS_KEY_SECRET','')
+OSS_BUCKET_NAME = 'mortem'
+OSS_ENDPOINT = 'oss-cn-guangzhou.aliyuncs.com'
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+MEDIA_URL = 'media/'
+STATIC_URL = '/static/'
+MEDIA_ROOT = BASE_DIR / 'media/'

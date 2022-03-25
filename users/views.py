@@ -1,11 +1,11 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+import datetime
 from .models import Profile, Type, Message
 from .serializers import UserSerializer, TypeSerializer, MessageSerializer
+from django.db.models import Q
 from rest_framework.decorators import api_view
 from rest_framework import status
-import datetime
-from django.db.models import Q
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 
 class AllUsers(APIView):
@@ -67,6 +67,7 @@ def updateUser(request):
     user.profile_image = request.data['profile_image']
     user.save()
     return Response(1)
+
 
 @api_view(['POST'])
 def createMessage(request):

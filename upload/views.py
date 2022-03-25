@@ -1,11 +1,17 @@
-from django.shortcuts import render
 from rest_framework.decorators import api_view
-from django.core.files.storage import default_storage
 from rest_framework.response import Response
+from django.shortcuts import render
+from django.core.files.storage import default_storage
+from .models import UploadModel
+from upload.serializers import UploadModelSerializer
 
 
 @api_view(['POST'])
 def savefile(request):
     file=request.FILES['file']
     file_name=default_storage.save(file.name, file)
-    return Response(file.name)
+    uploadModel = UploadModel()
+    uploadModel.name = file_name
+    uploadModel.image = file_name
+    serializer = UploadModelSerializer(uploadModel, many=False)
+    return Response(serializer.data)

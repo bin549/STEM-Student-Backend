@@ -1,31 +1,18 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+import datetime
+import random
 from .models import Entity, Genre, Selection, Wishlist, Lecture, Format, Comment
 from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, WishlistSerializer, LectureSerializer, FormatSerializer, CommentSerializer
+from .utils import paginateCourses
+from django.core.files.storage import default_storage
 from django.http import Http404
-from rest_framework.decorators import api_view
 from django.db.models import Q
+from homework.models import Assignment, Execution
+from rest_framework.decorators import api_view
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
 from users.models import Profile
 from users.serializers import UserSerializer
-import datetime
-from rest_framework import status
-from homework.models import Assignment, Execution
-from .utils import paginateCourses
-import random
-from django.core.files.storage import default_storage
-
-
-@api_view(['POST'])
-def createLectureComment(request):
-    user = Profile.objects.get(Q(id=request.data['userId']))
-    lecture = Lecture.objects.get(Q(id=request.data['lectureId']))
-    future_comment = Comment()
-    future_comment.user = user
-    future_comment.lecture = lecture
-    future_comment.content = request.data['content']
-    future_comment.comment_time = datetime.timedelta(days=30)
-    future_comment.save()
-    return Response('createCourse!')
 
 
 class AllCourse(APIView):
@@ -208,7 +195,6 @@ def createCourse(request):
 
 @api_view(['POST'])
 def updateCourse(request):
-
     request.data['genre']
     course = Entity.objects.get(id=request.data['course_id'])
     course.title = request.data['title']
@@ -252,7 +238,6 @@ def setPreviewLecture(request):
     lecture.is_preview = True
     lecture.save()
     return Response('Set was success!')
-
 
 
 @api_view(['POST'])
@@ -535,3 +520,16 @@ def loadCurrentSelectCourseTitle(request, course_id):
     course = Entity.objects.get(Q(id=course_id))
     serializer = CourseSerializer(course, many=False)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+def createLectureComment(request):
+    user = Profile.objects.get(Q(id=request.data['userId']))
+    lecture = Lecture.objects.get(Q(id=request.data['lectureId']))
+    future_comment = Comment()
+    future_comment.user = user
+    future_comment.lecture = lecture
+    future_comment.content = request.data['content']
+    future_comment.comment_time = datetime.timedelta(days=30)
+    future_comment.save()
+    return Response('createCourse!')

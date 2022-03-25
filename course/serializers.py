@@ -73,6 +73,7 @@ class LectureSerializer(serializers.ModelSerializer):
             "get_media"
         )
 
+
 class FormatSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -81,7 +82,6 @@ class FormatSerializer(serializers.ModelSerializer):
             "id",
             "name",
         )
-
 
 
 class CommentSerializer(serializers.ModelSerializer):

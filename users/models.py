@@ -1,7 +1,7 @@
 import uuid
+import os
 from django.db import models
 from django.contrib.auth.models import User
-import os
 
 
 class Type(models.Model):
@@ -40,7 +40,7 @@ class Profile(models.Model):
 
     def get_image(self):
         if self.profile_image:
-            return os.environ.get("BASEURL") + self.profile_image.url
+            return self.profile_image.url
         return ''
 
 

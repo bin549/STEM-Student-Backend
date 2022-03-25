@@ -1,6 +1,6 @@
-import uuid
 from django.db import models
 from users.models import Profile
+import uuid
 import os
 
 
@@ -25,6 +25,9 @@ class Entity(models.Model):
     is_visible = models.BooleanField(default=False, null=True)
     serial_number = models.IntegerField()
 
+    class Meta:
+        ordering = ['id']
+
     def __str__(self):
         return '%s' % self.title
 
@@ -33,12 +36,11 @@ class Entity(models.Model):
 
     def get_image(self):
         if self.cover_img:
-            return os.environ.get("BASEURL") + self.cover_img.url
+            return self.cover_img.url
         return ''
 
     def get_student_url(self):
         return f'/course_student/{self.id}/'
-
 
 
 class Selection(models.Model):
@@ -91,7 +93,7 @@ class Lecture(models.Model):
 
     def get_media(self):
         if self.media:
-            return os.environ.get("BASEURL") + self.media.url
+            return self.media.url
         return ''
 
 
@@ -105,3 +107,6 @@ class Comment(models.Model):
 
     def __str__(self):
         return '%s' % self.id
+
+    class Meta:
+        ordering = ['comment_time']

@@ -1,12 +1,12 @@
-from rest_framework.views import APIView
-from rest_framework.response import Response
+import datetime, time
 from .models import Assignment, Execution
 from .serializers import HomeworkSerializer,ExecutionSerializer
-from rest_framework.decorators import api_view
-from django.db.models import Q
 from course.models import Entity, Selection
+from django.db.models import Q
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
 from users.models import Profile
-import datetime, time
 
 
 class AllHomework(APIView):
@@ -38,7 +38,6 @@ def addHomework(request):
     new_homework.end_time = request.data['end_time']
     new_homework.course = course
     new_homework.save()
-
     selections = Selection.objects.filter(Q(course=courseId))
     for selection in selections:
         execution = Execution()
@@ -74,6 +73,7 @@ def loadExecution(request):
         userHomeworks.append(userHomework)
     return Response(1)
 
+
 @api_view(['POST'])
 def loadUserExecution(request):
     userId = request.data['userId']
@@ -81,8 +81,6 @@ def loadUserExecution(request):
     execution = Execution.objects.get(Q(homework=homework.id) & Q(user=userId))
     serializer = ExecutionSerializer(execution, many=False)
     return Response(serializer.data)
-
-
 
 
 @api_view(['GET'])
@@ -121,8 +119,6 @@ def getCheckedExecutions(request):
     else:
         executions = Execution.objects.filter(Q(homework=request.data['id']))
         executions = executions.exclude(Q(score=None))
-
-
     n_executions = []
     for execution in executions:
         user = Profile.objects.get(Q(id=execution.user.id))
@@ -136,7 +132,6 @@ def getCheckedExecutions(request):
 @api_view(['GET'])
 def getExcellentExecutions(request, homework_id):
     executions = Execution.objects.filter(Q(homework=homework_id) & Q(is_excellent=True))
-
     n_executions = []
     for execution in executions:
         user = Profile.objects.get(Q(id=execution.user.id))
@@ -147,7 +142,6 @@ def getExcellentExecutions(request, homework_id):
     return Response(n_executions)
 
 
-
 @api_view(['GET'])
 def getExcellentExecutionUserNames(request, homework_id):
     executions = Execution.objects.filter(Q(homework=homework_id) & Q(is_excellent=True))
@@ -156,7 +150,6 @@ def getExcellentExecutionUserNames(request, homework_id):
         user = Profile.objects.get(Q(id=execution.user.id))
         userNames.append(user.name)
     return Response(userNames)
-
 
 
 @api_view(['GET'])
@@ -215,7 +208,6 @@ def loadCourseAllHomeworks(request):
     return Response(userHomeworks)
 
 
-
 @api_view(['POST'])
 def loadCourseUnfinishHomeworks(request):
     executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(finish_time=None))
@@ -231,6 +223,7 @@ def loadCourseUnfinishHomeworks(request):
         except Exception:
             pass
     return Response(userHomeworks)
+
 
 @api_view(['POST'])
 def loadCourseFinishHomeworks(request):

@@ -1,7 +1,6 @@
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
-
 def paginateCourses(request, courses, results):
     page = request.data['page']
     paginator = Paginator(courses, results)
