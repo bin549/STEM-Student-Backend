@@ -24,4 +24,5 @@ urlpatterns = [
     path('getSelectedCourseHomeworks/<str:course_id>/', views.getSelectedCourseHomeworks),
     path('getExecutionsById/<str:homework_id>/', views.getExecutionsById),
     path('getExecutionExcellentById/<str:execution_id>/', views.getExecutionExcellentById),
+    path('loadCourseHomeworks/', views.loadCourseHomeworks),
 ]

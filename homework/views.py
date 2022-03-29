@@ -165,8 +165,8 @@ def getHomeworks(request, user_id):
     executions = Execution.objects.filter(Q(user=user_id))
     homeworks = []
     for execution in executions:
-        print(execution.homework.id)
-        homework = {"intro": execution.homework.intro, "description": execution.homework.description[0:50]+"..."}
+        homework = {"id": execution.homework.id, "intro": execution.homework.intro, "description": execution.homework.description[0:50]+"...",'finish_time': execution.finish_time
+        }
         homeworks.append(homework)
     return Response(homeworks)
     # homework = Assignment.objects.filter(Q(id=homework_id))
@@ -234,13 +234,36 @@ def loadCourseAllHomeworks(request):
     for execution in executions:
         try:
             homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
-            userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
+            userHomework = {'id': homework.id, 'description': homework.description[0:50]+"...",  'intro': homework.intro, 'start_time': homework.start_time,
                  'end_time': homework.end_time, 'score': execution.score,
                  'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
             userHomeworks.append(userHomework)
         except Exception:
             pass
     return Response(userHomeworks)
+
+
+@api_view(['POST'])
+def loadCourseHomeworks(request):
+    if (request.data['is_finish']):
+        executions = Execution.objects.filter(Q(user=request.data['userId']))
+        executions = executions.exclude(Q(finish_time=None))
+    else:
+        executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(finish_time=None))
+    userHomeworks = []
+    for execution in executions:
+        try:
+            if (request.data['courseId'] != 0):
+                homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+            else:
+                homework = Assignment.objects.get(Q(id=execution.homework.id))
+            userHomework = {"id": execution.homework.id, "intro": execution.homework.intro, "description": execution.homework.description[0:50]+"...",
+            'finish_time': execution.finish_time}
+            userHomeworks.append(userHomework)
+        except Exception:
+            pass
+    return Response(userHomeworks)
+
 
 
 @api_view(['POST'])
