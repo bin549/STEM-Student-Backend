@@ -1,18 +1,18 @@
 import datetime
 import random
-from .models import Entity, Genre, Selection, Wishlist, Lecture, Format, Comment
-from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, WishlistSerializer, LectureSerializer, FormatSerializer, CommentSerializer
-from .utils import paginateCourses
 from django.core.files.storage import default_storage
 from django.http import Http404
 from django.db.models import Q
-from homework.models import Assignment, Execution
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from homework.models import Assignment, Execution
 from users.models import Profile
 from users.serializers import UserSerializer
+from .models import Entity, Genre, Selection, Wishlist, Lecture, Format, Comment
+from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, WishlistSerializer, LectureSerializer, FormatSerializer, CommentSerializer
+from .utils import paginateCourses
 
 
 class AllCourse(APIView):
@@ -408,13 +408,15 @@ def addCourseLecture(request):
     except Exception:
         return Response('Format Not Existed', status=status.HTTP_201_CREATED)
     fileName = request.data['fileName']
+
     photo_format=('png', 'jpg', 'bmp', 'gif')
     video_format=('mp4', 'mov')
     if fileName.split('.')[-1].lower() in photo_format:
         format = Format.objects.get(Q(name='Photo'))
     elif fileName.split('.')[-1].lower() in video_format:
         format = Format.objects.get(Q(name='Video'))
-    print(format)
+
+
     lecture = Lecture()
     lecture.title = request.data['title']
     lecture.course = course
@@ -533,3 +535,10 @@ def createLectureComment(request):
     future_comment.comment_time = datetime.timedelta(days=30)
     future_comment.save()
     return Response('createCourse!')
+
+@api_view(['GET'])
+def getOwnerByCourseName(request, course_name):
+    course = Entity.objects.get(Q(title=course_name))
+    owner = Profile.objects.get(Q(id=course.owner.id))
+    serializer = UserSerializer(owner, many=False)
+    return Response(serializer.data)

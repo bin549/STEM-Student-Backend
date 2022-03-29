@@ -7,7 +7,6 @@ urlpatterns = [
     path('getUserInfo/<str:pk>/', views.getUserInfo),
     path('getUserTypeName/', views.getUserTypeName),
     path('getUsersByTypeName/<str:type_name>/', views.getUsersByTypeName),
-    path('getUsersByTypeName/<str:type_name>/', views.getUsersByTypeName),
     path('addUser/', views.addUser),
     path('createMessage/', views.createMessage),
     path('getInboxUnreadCount/', views.getInboxUnreadCount),

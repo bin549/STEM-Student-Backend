@@ -1,9 +1,9 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from django.shortcuts import render
 from django.core.files.storage import default_storage
-from .models import UploadModel
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from upload.serializers import UploadModelSerializer
+from .models import UploadModel
 
 
 @api_view(['POST'])

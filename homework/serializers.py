@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Assignment, Execution
+from .models import Assignment, Execution, Media, MediaType
 
 
 class HomeworkSerializer(serializers.ModelSerializer):
@@ -28,8 +28,30 @@ class ExecutionSerializer(serializers.ModelSerializer):
             "finish_time",
             "is_excellent",
             "content_text",
-            "content_media",
             "homework",
             "user",
-            "get_media"
         )
+
+class MediaSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Media
+        fields = (
+            "id",
+            "media",
+            "execution",
+            "type",
+            "get_media",
+        )
+
+
+class MediaTypeSerializer(serializers.ModelSerializer):
+
+   class Meta:
+
+       model = MediaType
+       fields = (
+           "id",
+           "name",
+       )

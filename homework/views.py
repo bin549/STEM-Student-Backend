@@ -1,27 +1,14 @@
+import json
 import datetime, time
-from .models import Assignment, Execution
-from .serializers import HomeworkSerializer,ExecutionSerializer
-from course.models import Entity, Selection
+from django.core.files.storage import default_storage
 from django.db.models import Q
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from course.models import Entity, Selection
 from users.models import Profile
-
-
-class AllHomework(APIView):
-
-    def get(self, request, format=None):
-        homeworks = Homework.objects.all()[0:4]
-        serializer = HomeworkSerializer(homeworks, many=True)
-        return Response(serializer.data)
-
-
-@api_view(['GET'])
-def getSelectedCourseHomeworks(request, course_id):
-    homeworks = Assignment.objects.filter(Q(course=course_id))
-    serializer = HomeworkSerializer(homeworks, many=True)
-    return Response(serializer.data)
+from .models import Assignment, Execution, MediaType, Media
+from .serializers import HomeworkSerializer, ExecutionSerializer, MediaSerializer, MediaTypeSerializer
 
 
 @api_view(['POST'])
@@ -60,6 +47,20 @@ def deleteHomework(request):
     except Exception:
         return Response(0)
 
+
+class AllHomework(APIView):
+
+    def get(self, request, format=None):
+        homeworks = Homework.objects.all()[0:4]
+        serializer = HomeworkSerializer(homeworks, many=True)
+        return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getSelectedCourseHomeworks(request, course_id):
+    homeworks = Assignment.objects.filter(Q(course=course_id))
+    serializer = HomeworkSerializer(homeworks, many=True)
+    return Response(serializer.data)
 
 @api_view(['POST'])
 def loadExecution(request):
@@ -159,12 +160,37 @@ def getHomeworkById(request, homework_id):
     return Response(serializer.data)
 
 
+@api_view(['GET'])
+def getHomeworks(request, user_id):
+    executions = Execution.objects.filter(Q(user=user_id))
+    homeworks = []
+    for execution in executions:
+        print(execution.homework.id)
+        homework = {"intro": execution.homework.intro, "description": execution.homework.description[0:50]+"..."}
+        homeworks.append(homework)
+    return Response(homeworks)
+    # homework = Assignment.objects.filter(Q(id=homework_id))
+    # serializer = HomeworkSerializer(homework, many=False)
+    # return Response(serializer.data)
+
+
 @api_view(['POST'])
 def uploadHomework(request):
     execution = Execution.objects.get(Q(homework=request.data['homeworkId']) & Q(user=request.data['userId']))
     execution.finish_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     execution.content_text = request.data['contentText']
-    execution.content_media = request.data['contentMedia']
+    photo_format=('png', 'jpg', 'jpeg', 'bmp', 'gif')
+    video_format=('mp4', 'mov')
+    for contentMedia in request.data['contentMedia']:
+        media = Media()
+        if contentMedia.split('.')[-1].lower() in photo_format:
+            media_type = MediaType.objects.get(Q(name='Photo'))
+        elif contentMedia.split('.')[-1].lower() in video_format:
+            media_type = MediaType.objects.get(Q(name='Video'))
+        media.media = contentMedia
+        media.execution = execution
+        media.type = media_type
+        media.save()
     execution.save()
     return Response(1)
 
@@ -173,6 +199,15 @@ def uploadHomework(request):
 def loadExecution(request):
     execution = Execution.objects.get(Q(homework=request.data['homeworkId']) & Q(user=request.data['userId']))
     serializer = ExecutionSerializer(execution, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getExecutionImages(request, execution_id):
+    execution = Execution.objects.get(Q(id=execution_id))
+    media_type = MediaType.objects.get(Q(name="Photo"))
+    medias = Media.objects.filter(Q(execution=execution.id) & Q(type=media_type))
+    serializer = MediaSerializer(medias, many=True)
     return Response(serializer.data)
 
 
