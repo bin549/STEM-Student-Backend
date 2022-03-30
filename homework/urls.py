@@ -30,4 +30,7 @@ urlpatterns = [
     path('changeStarStatus/', views.changeStarStatus),
     path('getUserStarExecutions/<str:user_id>/', views.getUserStarExecutions),
     path('removeStar/', views.removeStar),
+    path('getCourseId/<str:homework_id>/', views.getCourseId),
+    path('getHomeworkId/<str:execution_id>/', views.getHomeworkId),
+    path('getExecutionById/<str:execution_id>/', views.getExecutionById),
 ]

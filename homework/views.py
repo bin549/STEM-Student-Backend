@@ -156,6 +156,7 @@ def loadExcellentExecutions(request):
         for media in medias:
             content_images.append(media.get_media())
         n_execution = { 'id': execution.id,
+                        'user_id': user.user_id,
                         'user_name': user.name,
                         'user_image': user.get_image(),
                         'user_id': user.id,
@@ -394,3 +395,32 @@ def removeStar(request):
         return Response(1)
     except Exception:
         return Response(0)
+
+
+@api_view(['GET'])
+def getCourseId(request, homework_id):
+    homework = Assignment.objects.get(Q(id=homework_id))
+    return Response(homework.course.id)
+
+
+@api_view(['GET'])
+def getHomeworkId(request, execution_id):
+    execution = Execution.objects.get(Q(id=execution_id))
+    return Response(execution.homework.id)
+
+
+@api_view(['GET'])
+def getExecutionById(request, execution_id):
+    execution = Execution.objects.get(Q(id=execution_id))
+    content_images = []
+    media_type = MediaType.objects.get(Q(name="Photo"))
+    medias = Media.objects.filter(Q(execution=execution.id) & Q(type=media_type))
+    for media in medias:
+        content_images.append(media.get_media())
+    n_execution = { 'id': execution.id,
+                    'finish_time': execution.finish_time,
+                    'content_text': execution.content_text,
+                    'is_excellent': execution.is_excellent,
+                    'content_images': content_images
+                    }
+    return Response(n_execution)
