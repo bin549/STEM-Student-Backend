@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from course.models import Entity, Selection
 from users.models import Profile
-from .models import Assignment, Execution, MediaType, Media
+from .models import Assignment, Execution, MediaType, Media, ExecutionStar
 from .serializers import HomeworkSerializer, ExecutionSerializer, MediaSerializer, MediaTypeSerializer
 
 
@@ -61,6 +61,7 @@ def getSelectedCourseHomeworks(request, course_id):
     homeworks = Assignment.objects.filter(Q(course=course_id))
     serializer = HomeworkSerializer(homeworks, many=True)
     return Response(serializer.data)
+
 
 @api_view(['POST'])
 def loadExecution(request):
@@ -139,6 +140,29 @@ def getExcellentExecutions(request, homework_id):
         n_execution = { 'id': execution.id, 'userName': user.name,
                         'finish_time': execution.finish_time, 'score': execution.score,
                          'is_excellent': execution.is_excellent}
+        n_executions.append(n_execution)
+    return Response(n_executions)
+
+
+@api_view(['GET'])
+def loadExcellentExecutions(request):
+    executions = Execution.objects.filter(Q(is_excellent=True))
+    n_executions = []
+    for execution in executions:
+        user = Profile.objects.get(Q(id=execution.user.id))
+        content_images = []
+        media_type = MediaType.objects.get(Q(name="Photo"))
+        medias = Media.objects.filter(Q(execution=execution.id) & Q(type=media_type))
+        for media in medias:
+            content_images.append(media.get_media())
+        n_execution = { 'id': execution.id,
+                        'user_name': user.name,
+                        'user_image': user.get_image(),
+                        'user_id': user.id,
+                        'finish_time': execution.finish_time,
+                        'content_text': execution.content_text,
+                        'content_images': content_images
+                        }
         n_executions.append(n_execution)
     return Response(n_executions)
 
@@ -310,3 +334,63 @@ def getUnfinishHomework(request, user_id):
         serializer = HomeworkSerializer(homework, many=False)
         homeworks.append(serializer.data)
     return Response(homeworks)
+
+
+@api_view(['POST'])
+def getStarStatus(request):
+    try:
+        executionStar = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
+        return Response(1)
+    except Exception:
+        return Response(0)
+
+
+@api_view(['POST'])
+def changeStarStatus(request):
+    if request.data["star_status"]:
+        star = ExecutionStar()
+        user = Profile.objects.get(Q(id=request.data['user_id']))
+        execution = Execution.objects.get(Q(id=request.data['execution_id']))
+        star.user = user
+        star.execution = execution
+        star.star_time = datetime.timedelta(days=30)
+        star.save()
+        return Response(1)
+    else:
+        star = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
+        star.delete()
+    return Response(0)
+
+
+
+@api_view(['GET'])
+def getUserStarExecutions(request, user_id):
+    stars = ExecutionStar.objects.filter(Q(user=user_id))
+    executions = []
+    for star in stars:
+        execution = Execution.objects.get(Q(id=star.execution.id))
+        user = Profile.objects.get(Q(id=execution.user.id))
+        content_images = []
+        media_type = MediaType.objects.get(Q(name="Photo"))
+        medias = Media.objects.filter(Q(execution=execution.id) & Q(type=media_type))
+        for media in medias:
+            content_images.append(media.get_media())
+        n_execution = { 'id': execution.id,
+                        'user_name': user.name,
+                        'user_image': user.get_image(),
+                        'user_id': user.id,
+                        'finish_time': execution.finish_time,
+                        'content_text': execution.content_text,
+                        'content_images': content_images
+                        }
+        executions.append(n_execution)
+    return Response(executions)
+
+@api_view(['POST'])
+def removeStar(request):
+    try:
+        star = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
+        star.delete();
+        return Response(1)
+    except Exception:
+        return Response(0)

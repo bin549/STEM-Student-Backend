@@ -542,3 +542,15 @@ def getOwnerByCourseName(request, course_name):
     owner = Profile.objects.get(Q(id=course.owner.id))
     serializer = UserSerializer(owner, many=False)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getLectureCommentsByUserId(request, user_id):
+    comments = Comment.objects.filter(Q(user=user_id))
+    n_comments = []
+    for comment in comments:
+        lecture = Lecture.objects.get(Q(id=comment.lecture.id))
+        n_comment = {'lecture': lecture.title, 'content': comment.content,
+             'comment_time': comment.comment_time}
+        n_comments.append(n_comment)
+    return Response(n_comments)

@@ -46,4 +46,5 @@ urlpatterns = [
     path('createLectureComment/', views.createLectureComment),
     path('getLectureComments/<str:lecture_id>/', views.getLectureComments),
     path('getOwnerByCourseName/<str:course_name>/', views.getOwnerByCourseName),
+    path('getLectureCommentsByUserId/<str:user_id>/', views.getLectureCommentsByUserId),
 ]

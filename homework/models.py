@@ -32,6 +32,17 @@ class Execution(models.Model):
         return '%s' % self.id
 
 
+class ExecutionStar(models.Model):
+
+    id = models.UUIDField(default=uuid.uuid4, unique=True,primary_key=True, editable=False)
+    user = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
+    execution = models.ForeignKey(Execution, null=True, blank=True, on_delete=models.CASCADE)
+    star_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return '%s' % self.id
+
+
 class MediaType(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)

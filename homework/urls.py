@@ -17,6 +17,7 @@ urlpatterns = [
     path('setExecutionScore/', views.setExecutionScore),
     path('getExecutionImages/<str:execution_id>/', views.getExecutionImages),
     path('getCheckedExecutions/', views.getCheckedExecutions),
+    path('loadExcellentExecutions/', views.loadExcellentExecutions),
     path('getExcellentExecutions/<str:homework_id>/', views.getExcellentExecutions),
     path('getExcellentExecutionUserNames/<str:homework_id>/', views.getExcellentExecutionUserNames),
     path('loadCourseUnfinishHomeworks/', views.loadCourseUnfinishHomeworks),
@@ -25,4 +26,8 @@ urlpatterns = [
     path('getExecutionsById/<str:homework_id>/', views.getExecutionsById),
     path('getExecutionExcellentById/<str:execution_id>/', views.getExecutionExcellentById),
     path('loadCourseHomeworks/', views.loadCourseHomeworks),
+    path('getStarStatus/', views.getStarStatus),
+    path('changeStarStatus/', views.changeStarStatus),
+    path('getUserStarExecutions/<str:user_id>/', views.getUserStarExecutions),
+    path('removeStar/', views.removeStar),
 ]
