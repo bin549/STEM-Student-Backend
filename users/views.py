@@ -1,5 +1,5 @@
 import datetime
-from .models import Profile, Type, Message
+from .models import Profile, Type, Message, Follow
 from .serializers import UserSerializer, TypeSerializer, MessageSerializer
 from django.db.models import Q
 from rest_framework.decorators import api_view
@@ -19,6 +19,12 @@ class AllUsers(APIView):
 @api_view(['GET'])
 def getUserInfo(request, pk):
     profile = Profile.objects.get(name=pk)
+    serializer = UserSerializer(profile, many=False)
+    return Response(serializer.data)
+
+@api_view(['GET'])
+def getUserInfoById(request, user_id):
+    profile = Profile.objects.get(id=user_id)
     serializer = UserSerializer(profile, many=False)
     return Response(serializer.data)
 
@@ -134,3 +140,66 @@ def deleteMessage(request, message_id):
     message = Message.objects.get(id=message_id)
     message.delete()
     return Response(1)
+
+
+@api_view(['POST'])
+def getFollowStatus(request):
+    try:
+        follow = Follow.objects.get(Q(user=request.data['user_id']) & Q(other_user=request.data['other_user_id']))
+        return Response(1)
+    except Exception:
+        return Response(0)
+
+
+@api_view(['POST'])
+def addFollow(request):
+    try:
+        follow = Follow.objects.get(Q(user=request.data['user_id']) & Q(other_user=request.data['other_user_id']))
+        return Response(0)
+    except Exception:
+        new_follow = Follow()
+        user = Profile.objects.get(Q(id=request.data['user_id']))
+        other_user = Profile.objects.get(Q(id=request.data['other_user_id']))
+        new_follow.user = user
+        new_follow.other_user = other_user
+        new_follow.follow_time = datetime.timedelta(days=30)
+        new_follow.save()
+        return Response(1)
+
+
+@api_view(['POST'])
+def removeFollow(request):
+    try:
+        follow = Follow.objects.get(Q(user=request.data['user_id']) & Q(other_user=request.data['other_user_id']))
+        follow.delete()
+        return Response(1)
+    except Exception:
+        return Response(0)
+
+
+@api_view(['GET'])
+def getFollowersId(request, user_id):
+    follows = Follow.objects.filter(other_user=user_id)
+    followers = []
+    for follow in follows:
+        follower = Profile.objects.get(Q(id=follow.other_user.id))
+        followers.append(
+            {
+                "id": follower.id
+            }
+        )
+    return Response(followers)
+
+
+@api_view(['GET'])
+def getFollowingsId(request, user_id):
+    follows = Follow.objects.filter(user=user_id)
+    followers = []
+    for follow in follows:
+        follower = Profile.objects.get(Q(id=follow.other_user.id))
+        followers.append(
+            {
+                "id": follower.id
+            }
+        )
+    return Response(followers)

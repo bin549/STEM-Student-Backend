@@ -44,13 +44,6 @@ class Profile(models.Model):
         return ''
 
 
-class Follow(models.Model):
-    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    user = models.OneToOneField(Profile, on_delete=models.CASCADE, null=True, blank=True)
-    other_user = models.OneToOneField(Profile, on_delete=models.CASCADE, null=True, blank=True, related_name="other_user")
-    follow_time = models.DateTimeField(auto_now_add=True)
-
-
 class Message(models.Model):
 
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
@@ -63,3 +56,10 @@ class Message(models.Model):
 
     def __str__(self):
         return '%s' % self.id
+
+
+class Follow(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.OneToOneField(Profile, on_delete=models.CASCADE, unique=False, null=True, blank=True)
+    other_user = models.OneToOneField(Profile, on_delete=models.CASCADE,  unique=False, null=True, blank=True, related_name="other_user")
+    follow_time = models.DateTimeField(auto_now_add=True)

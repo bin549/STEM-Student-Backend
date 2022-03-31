@@ -18,4 +18,10 @@ urlpatterns = [
     path('getUserNameById/<str:user_id>/', views.getUserNameById),
     path('getUserById/<str:user_id>/', views.getUserById),
     path('updateUser/', views.updateUser),
+    path('getUserInfoById/<str:user_id>/', views.getUserInfoById),
+    path('getFollowStatus/', views.getFollowStatus),
+    path('addFollow/', views.addFollow),
+    path('removeFollow/', views.removeFollow),
+    path('getFollowersId/<str:user_id>/', views.getFollowersId),
+    path('getFollowingsId/<str:user_id>/', views.getFollowingsId),
 ]
