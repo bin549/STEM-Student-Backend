@@ -48,4 +48,5 @@ urlpatterns = [
     path('getOwnerByCourseName/<str:course_name>/', views.getOwnerByCourseName),
     path('getLectureCommentsByUserId/<str:user_id>/', views.getLectureCommentsByUserId),
     path('getLectureById/<str:lecture_id>/', views.getLectureById),
+    path('deleteCommentById/<str:comment_id>/', views.deleteCommentById),
 ]

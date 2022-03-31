@@ -107,8 +107,17 @@ def getUserSelection(request, user_id):
 @api_view(['GET'])
 def getCourseLectures(request, course_id):
     lectures = Lecture.objects.filter(Q(course=course_id))
-    serializer = LectureSerializer(lectures, many=True)
-    return Response(serializer.data)
+    n_lectures = []
+    for lecture in lectures:
+        format = Format.objects.get(Q(id=lecture.format.id))
+        n_lecture = {
+            "id": lecture.id,
+            "title": lecture.title,
+            "format_name": format.name
+        }
+        n_lectures.append(n_lecture)
+    print(n_lectures)
+    return Response(n_lectures)
 
 
 @api_view(['GET'])
@@ -296,7 +305,7 @@ def registerCourse(request):
 @api_view(['POST'])
 def getCourseStatus(request):
     try:
-        selection = Selection.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        selection = Selection.objects.get(Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
         return Response(1)
     except Exception:
         return Response(0)
@@ -305,7 +314,7 @@ def getCourseStatus(request):
 @api_view(['POST'])
 def getWishlistStatus(request):
     try:
-        wishlist = Wishlist.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        wishlist = Wishlist.objects.get(Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
         return Response(1)
     except Exception:
         return Response(0)
@@ -550,7 +559,7 @@ def getLectureCommentsByUserId(request, user_id):
     n_comments = []
     for comment in comments:
         lecture = Lecture.objects.get(Q(id=comment.lecture.id))
-        n_comment = {'lecture': lecture.title, 'content': comment.content,
+        n_comment = {'id': comment.id, 'lecture': lecture.title, 'content': comment.content,
              'comment_time': comment.comment_time}
         n_comments.append(n_comment)
     return Response(n_comments)
@@ -561,3 +570,10 @@ def getLectureById(request, lecture_id):
     lecture = Lecture.objects.get(Q(id=lecture_id))
     serializer = LectureSerializer(lecture, many=False)
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+def deleteCommentById(request, comment_id):
+    comment = Comment.objects.get(Q(id=comment_id))
+    comment.delete()
+    return Response(1)
