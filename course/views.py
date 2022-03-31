@@ -554,3 +554,10 @@ def getLectureCommentsByUserId(request, user_id):
              'comment_time': comment.comment_time}
         n_comments.append(n_comment)
     return Response(n_comments)
+
+
+@api_view(['GET'])
+def getLectureById(request, lecture_id):
+    lecture = Lecture.objects.get(Q(id=lecture_id))
+    serializer = LectureSerializer(lecture, many=False)
+    return Response(serializer.data)
