@@ -1,6 +1,6 @@
 import datetime
-from .models import Profile, Type, Message, Follow
-from .serializers import UserSerializer, TypeSerializer, MessageSerializer
+from .models import Profile, Type, Message, Follow, Note
+from .serializers import UserSerializer, TypeSerializer, MessageSerializer, NoteSerializer
 from django.db.models import Q
 from rest_framework.decorators import api_view
 from rest_framework import status
@@ -17,7 +17,7 @@ class AllUsers(APIView):
 
 
 @api_view(['GET'])
-def getUserInfo(request, pk):
+def getUserByUserName(request, pk):
     profile = Profile.objects.get(name=pk)
     serializer = UserSerializer(profile, many=False)
     return Response(serializer.data)
@@ -92,16 +92,18 @@ def createMessage(request):
     return Response(1)
 
 
-@api_view(['POST'])
-def getInboxUnreadCount(request):
-    user = Profile.objects.get(name=request.data['user'])
+
+@api_view(['GET'])
+def getInboxUnreadCount(request, user_name):
+    print(user_name)
+    user = Profile.objects.get(name=user_name)
     messages = Message.objects.filter(Q(recipient=user.id) & Q(is_read=False))
     return Response(messages.count())
 
-
-@api_view(['POST'])
-def getInboxReadCount(request):
-    user = Profile.objects.get(name=request.data['user'])
+@api_view(['GET'])
+def getInboxReadCount(request, user_name):
+    print(user_name)
+    user = Profile.objects.get(name=user_name)
     messages = Message.objects.filter(Q(recipient=user.id) & Q(is_read=True))
     return Response(messages.count())
 
@@ -183,7 +185,7 @@ def getFollowersId(request, user_id):
     follows = Follow.objects.filter(other_user=user_id)
     followers = []
     for follow in follows:
-        follower = Profile.objects.get(Q(id=follow.other_user.id))
+        follower = Profile.objects.get(Q(id=follow.user.id))
         followers.append(
             {
                 "id": follower.id
@@ -204,3 +206,35 @@ def getFollowingsId(request, user_id):
             }
         )
     return Response(followers)
+
+
+@api_view(['GET'])
+def getUserTypeById(request, user_type_id):
+    type = Type.objects.get(id=user_type_id)
+    serializer = TypeSerializer(type, many=False)
+    return Response(serializer.data)
+
+
+@api_view(['GET'])
+def getNotes(request, user_id):
+    notes = Note.objects.filter(user=user_id)
+    serializer = NoteSerializer(notes, many=True)
+    return Response(serializer.data)
+
+
+@api_view(['POST'])
+def createNote(request):
+    note = Note()
+    note.user = Profile.objects.get(id=request.data['user_id'])
+    note.title = request.data['title']
+    note.content = request.data['content']
+    note.note_time = datetime.timedelta(days=30)
+    note.save()
+    return Response(note.id)
+
+
+@api_view(['GET'])
+def getNoteById(request, note_id):
+    note = Note.objects.get(id=note_id)
+    serializer = NoteSerializer(note, many=False)
+    return Response(serializer.data)

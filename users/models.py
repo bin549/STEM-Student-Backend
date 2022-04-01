@@ -63,3 +63,11 @@ class Follow(models.Model):
     user = models.OneToOneField(Profile, on_delete=models.CASCADE, unique=False, null=True, blank=True)
     other_user = models.OneToOneField(Profile, on_delete=models.CASCADE,  unique=False, null=True, blank=True, related_name="other_user")
     follow_time = models.DateTimeField(auto_now_add=True)
+
+
+class Note(models.Model):
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True)
+    title = models.CharField(max_length=200, null=True, blank=True)
+    content = models.TextField()
+    note_time = models.DateTimeField(auto_now_add=True)

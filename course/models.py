@@ -115,8 +115,7 @@ class Lecture(models.Model):
 
 class Comment(models.Model):
 
-    id = models.UUIDField(default=uuid.uuid4, unique=True,
-                          primary_key=True, editable=False)
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(
         Profile, null=True, blank=True, on_delete=models.CASCADE)
     lecture = models.ForeignKey(
@@ -129,3 +128,15 @@ class Comment(models.Model):
 
     class Meta:
         ordering = ['comment_time']
+
+
+class Evaluation(models.Model):
+
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
+    course = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
+    content = models.CharField(max_length=2000)
+    evaluate_time= models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return '%s' % self.id

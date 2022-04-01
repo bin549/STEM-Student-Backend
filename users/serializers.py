@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Profile, Type, Message
+from .models import Profile, Type, Message, Note
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -47,4 +47,19 @@ class MessageSerializer(serializers.ModelSerializer):
             "content",
             "is_read",
             "created_time",
+        )
+
+
+
+class NoteSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Note
+        fields = (
+            "id",
+            "user",
+            "title",
+            "content",
+            "note_time",
         )
