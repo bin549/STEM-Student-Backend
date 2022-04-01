@@ -239,7 +239,8 @@ def setPreviewLecture(request):
     lecture = Lecture.objects.get(Q(id=request.data['lectureId']))
     course = Entity.objects.get(Q(id=lecture.course.id))
     try:
-        courseLecture  = Lecture.objects.get(Q(is_preview=True) & Q(course=course.id))
+        courseLecture = Lecture.objects.get(
+            Q(is_preview=True) & Q(course=course.id))
         courseLecture.is_preview = False
         courseLecture.save()
     except Exception:
@@ -275,16 +276,19 @@ def getLectureComments(request, lecture_id):
 def registerCourse(request):
     try:
         user = Profile.objects.get(Q(id=request.data['userId']))
-        course = Entity.objects.get(Q(serial_number=request.data['serialNumber']))
+        course = Entity.objects.get(
+            Q(serial_number=request.data['serialNumber']))
     except Exception:
         return Response('Not Existed', status=status.HTTP_201_CREATED)
     try:
-        existed_selection = Selection.objects.get(Q(user=user.id) & Q(course=course.id))
+        existed_selection = Selection.objects.get(
+            Q(user=user.id) & Q(course=course.id))
         if existed_selection:
             return Response('Register Before', status=status.HTTP_201_CREATED)
     except Exception:
         try:
-            wishlist = Wishlist.objects.get(Q(user=user.id) & Q(course=course.id))
+            wishlist = Wishlist.objects.get(
+                Q(user=user.id) & Q(course=course.id))
             wishlist.delete()
         except Exception:
             print('wishlist was deleted!')
@@ -305,7 +309,8 @@ def registerCourse(request):
 @api_view(['POST'])
 def getCourseStatus(request):
     try:
-        selection = Selection.objects.get(Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
+        selection = Selection.objects.get(
+            Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
         return Response(1)
     except Exception:
         return Response(0)
@@ -314,7 +319,8 @@ def getCourseStatus(request):
 @api_view(['POST'])
 def getWishlistStatus(request):
     try:
-        wishlist = Wishlist.objects.get(Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
+        wishlist = Wishlist.objects.get(
+            Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
         return Response(1)
     except Exception:
         return Response(0)
@@ -323,7 +329,8 @@ def getWishlistStatus(request):
 @api_view(['POST'])
 def addWishlist(request):
     try:
-        wishlist = Wishlist.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        wishlist = Wishlist.objects.get(
+            Q(user=request.data['userId']) & Q(course=request.data['courseId']))
         return Response(0)
     except Exception:
         new_wishlist = Wishlist()
@@ -339,7 +346,8 @@ def addWishlist(request):
 @api_view(['POST'])
 def removeWishlist(request):
     try:
-        wishlist = Wishlist.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        wishlist = Wishlist.objects.get(
+            Q(user=request.data['userId']) & Q(course=request.data['courseId']))
         wishlist.delete()
         return Response(1)
     except Exception:
@@ -371,13 +379,16 @@ def setCourseVisible(request):
 @api_view(['POST'])
 def deleteCourseStudent(request):
     try:
-        selection = Selection.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        selection = Selection.objects.get(
+            Q(user=request.data['userId']) & Q(course=request.data['courseId']))
     except Exception:
         return Response('Selection Existed', status=status.HTTP_201_CREATED)
     try:
-        homeworks = Assignment.objects.filter(Q(course=request.data['courseId']))
+        homeworks = Assignment.objects.filter(
+            Q(course=request.data['courseId']))
         for homework in homeworks:
-            execution = Execution.objects.get(Q(user=request.data['userId']) & Q(homework=homework.id))
+            execution = Execution.objects.get(
+                Q(user=request.data['userId']) & Q(homework=homework.id))
             execution.delete()
     except Exception:
         return Response('Homework Not Existed', status=status.HTTP_201_CREATED)
@@ -393,7 +404,8 @@ def addCourseStudent(request):
     except Exception:
         return Response('user Not Existed', status=status.HTTP_201_CREATED)
     try:
-        Selection.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        Selection.objects.get(Q(user=request.data['userId']) & Q(
+            course=request.data['courseId']))
         return Response('Selection Existed', status=status.HTTP_201_CREATED)
     except Exception:
         selection = Selection()
@@ -418,13 +430,12 @@ def addCourseLecture(request):
         return Response('Format Not Existed', status=status.HTTP_201_CREATED)
     fileName = request.data['fileName']
 
-    photo_format=('png', 'jpg', 'bmp', 'gif')
-    video_format=('mp4', 'mov')
+    photo_format = ('png', 'jpg', 'bmp', 'gif')
+    video_format = ('mp4', 'mov')
     if fileName.split('.')[-1].lower() in photo_format:
         format = Format.objects.get(Q(name='Photo'))
     elif fileName.split('.')[-1].lower() in video_format:
         format = Format.objects.get(Q(name='Video'))
-
 
     lecture = Lecture()
     lecture.title = request.data['title']
@@ -450,14 +461,15 @@ def getCourseByTypeAndPage(request):
 
 @api_view(['POST'])
 def getUserCoursesByTypeAndPage(request):
-    userId=request.data['userId']
+    userId = request.data['userId']
     selections = Selection.objects.filter(Q(user=userId))
     course_ids = set()
     for e in selections:
         course_ids.add(e.course.id)
     try:
         genre = Genre.objects.get(Q(name=request.data['genre']))
-        courses = Entity.objects.filter(Q(genre=genre.id) & Q(id__in=course_ids))
+        courses = Entity.objects.filter(
+            Q(genre=genre.id) & Q(id__in=course_ids))
     except Exception:
         courses = Entity.objects.filter(Q(id__in=course_ids))
     serializer = CourseSerializer(courses, many=True)
@@ -477,7 +489,7 @@ def getCoursesCount(request):
 
 @api_view(['POST'])
 def getRecomendedCourse(request):
-    userId=request.data['userId']
+    userId = request.data['userId']
     if userId:
         course_ids = set()
         selections = Selection.objects.filter(Q(user=userId))
@@ -498,14 +510,15 @@ def getRecomendedCourse(request):
 
 @api_view(['POST'])
 def getMyCoursesCount(request):
-    userId=request.data['userId']
+    userId = request.data['userId']
     selections = Selection.objects.filter(Q(user=userId))
     course_ids = set()
     for e in selections:
         course_ids.add(e.course.id)
     try:
         genre = Genre.objects.get(Q(name=request.data['genre']))
-        courses = Entity.objects.filter(Q(genre=genre.id) & Q(id__in=course_ids))
+        courses = Entity.objects.filter(
+            Q(genre=genre.id) & Q(id__in=course_ids))
     except Exception:
         courses = Entity.objects.filter(Q(id__in=course_ids))
     return Response(len(courses))
@@ -545,6 +558,7 @@ def createLectureComment(request):
     future_comment.save()
     return Response('createCourse!')
 
+
 @api_view(['GET'])
 def getOwnerByCourseName(request, course_name):
     course = Entity.objects.get(Q(title=course_name))
@@ -560,7 +574,7 @@ def getLectureCommentsByUserId(request, user_id):
     for comment in comments:
         lecture = Lecture.objects.get(Q(id=comment.lecture.id))
         n_comment = {'id': comment.id, 'lecture': lecture.title, 'content': comment.content,
-             'comment_time': comment.comment_time}
+                     'comment_time': comment.comment_time}
         n_comments.append(n_comment)
     return Response(n_comments)
 

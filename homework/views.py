@@ -1,5 +1,6 @@
-import json
-import datetime, time
+from .serializers import HomeworkSerializer, ExecutionSerializer, MediaSerializer, MediaTypeSerializer
+import datetime
+import time
 from django.core.files.storage import default_storage
 from django.db.models import Q
 from rest_framework.views import APIView
@@ -8,7 +9,6 @@ from rest_framework.decorators import api_view
 from course.models import Entity, Selection
 from users.models import Profile
 from .models import Assignment, Execution, MediaType, Media, ExecutionStar
-from .serializers import HomeworkSerializer, ExecutionSerializer, MediaSerializer, MediaTypeSerializer
 
 
 @api_view(['POST'])
@@ -91,9 +91,9 @@ def getExecutionsById(request, homework_id):
     n_executions = []
     for execution in executions:
         user = Profile.objects.get(Q(id=execution.user.id))
-        n_execution = { 'id': execution.id, 'userName': user.name,
-                        'finish_time': execution.finish_time, 'score': execution.score,
-                         'is_excellent': execution.is_excellent}
+        n_execution = {'id': execution.id, 'userName': user.name,
+                       'finish_time': execution.finish_time, 'score': execution.score,
+                       'is_excellent': execution.is_excellent}
         n_executions.append(n_execution)
     return Response(n_executions)
 
@@ -117,29 +117,31 @@ def getExecutionExcellentById(request, execution_id):
 @api_view(['POST'])
 def getCheckedExecutions(request):
     if request.data['is_check'] == False:
-        executions = Execution.objects.filter(Q(homework=request.data['id']) & Q(score=None))
+        executions = Execution.objects.filter(
+            Q(homework=request.data['id']) & Q(score=None))
     else:
         executions = Execution.objects.filter(Q(homework=request.data['id']))
         executions = executions.exclude(Q(score=None))
     n_executions = []
     for execution in executions:
         user = Profile.objects.get(Q(id=execution.user.id))
-        n_execution = { 'id': execution.id, 'userName': user.name,
-                        'finish_time': execution.finish_time, 'score': execution.score,
-                         'is_excellent': execution.is_excellent}
+        n_execution = {'id': execution.id, 'userName': user.name,
+                       'finish_time': execution.finish_time, 'score': execution.score,
+                       'is_excellent': execution.is_excellent}
         n_executions.append(n_execution)
     return Response(n_executions)
 
 
 @api_view(['GET'])
 def getExcellentExecutions(request, homework_id):
-    executions = Execution.objects.filter(Q(homework=homework_id) & Q(is_excellent=True))
+    executions = Execution.objects.filter(
+        Q(homework=homework_id) & Q(is_excellent=True))
     n_executions = []
     for execution in executions:
         user = Profile.objects.get(Q(id=execution.user.id))
-        n_execution = { 'id': execution.id, 'userName': user.name,
-                        'finish_time': execution.finish_time, 'score': execution.score,
-                         'is_excellent': execution.is_excellent}
+        n_execution = {'id': execution.id, 'userName': user.name,
+                       'finish_time': execution.finish_time, 'score': execution.score,
+                       'is_excellent': execution.is_excellent}
         n_executions.append(n_execution)
     return Response(n_executions)
 
@@ -152,25 +154,27 @@ def loadExcellentExecutions(request):
         user = Profile.objects.get(Q(id=execution.user.id))
         content_images = []
         media_type = MediaType.objects.get(Q(name="Photo"))
-        medias = Media.objects.filter(Q(execution=execution.id) & Q(type=media_type))
+        medias = Media.objects.filter(
+            Q(execution=execution.id) & Q(type=media_type))
         for media in medias:
             content_images.append(media.get_media())
-        n_execution = { 'id': execution.id,
-                        'user_id': user.user_id,
-                        'user_name': user.name,
-                        'user_image': user.get_image(),
-                        'user_id': user.id,
-                        'finish_time': execution.finish_time,
-                        'content_text': execution.content_text,
-                        'content_images': content_images
-                        }
+        n_execution = {'id': execution.id,
+                       'user_id': user.user_id,
+                       'user_name': user.name,
+                       'user_image': user.get_image(),
+                       'user_id': user.id,
+                       'finish_time': execution.finish_time,
+                       'content_text': execution.content_text,
+                       'content_images': content_images
+                       }
         n_executions.append(n_execution)
     return Response(n_executions)
 
 
 @api_view(['GET'])
 def getExcellentExecutionUserNames(request, homework_id):
-    executions = Execution.objects.filter(Q(homework=homework_id) & Q(is_excellent=True))
+    executions = Execution.objects.filter(
+        Q(homework=homework_id) & Q(is_excellent=True))
     userNames = []
     for execution in executions:
         user = Profile.objects.get(Q(id=execution.user.id))
@@ -190,8 +194,8 @@ def getHomeworks(request, user_id):
     executions = Execution.objects.filter(Q(user=user_id))
     homeworks = []
     for execution in executions:
-        homework = {"id": execution.homework.id, "intro": execution.homework.intro, "description": execution.homework.description[0:50]+"...",'finish_time': execution.finish_time
-        }
+        homework = {"id": execution.homework.id, "intro": execution.homework.intro, "description": execution.homework.description[0:50]+"...", 'finish_time': execution.finish_time
+                    }
         homeworks.append(homework)
     return Response(homeworks)
     # homework = Assignment.objects.filter(Q(id=homework_id))
@@ -201,11 +205,13 @@ def getHomeworks(request, user_id):
 
 @api_view(['POST'])
 def uploadHomework(request):
-    execution = Execution.objects.get(Q(homework=request.data['homeworkId']) & Q(user=request.data['userId']))
-    execution.finish_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    execution = Execution.objects.get(
+        Q(homework=request.data['homeworkId']) & Q(user=request.data['userId']))
+    execution.finish_time = time.strftime(
+        "%Y-%m-%d %H:%M:%S", time.localtime())
     execution.content_text = request.data['contentText']
-    photo_format=('png', 'jpg', 'jpeg', 'bmp', 'gif')
-    video_format=('mp4', 'mov')
+    photo_format = ('png', 'jpg', 'jpeg', 'bmp', 'gif')
+    video_format = ('mp4', 'mov')
     for contentMedia in request.data['contentMedia']:
         media = Media()
         if contentMedia.split('.')[-1].lower() in photo_format:
@@ -222,7 +228,8 @@ def uploadHomework(request):
 
 @api_view(['POST'])
 def loadExecution(request):
-    execution = Execution.objects.get(Q(homework=request.data['homeworkId']) & Q(user=request.data['userId']))
+    execution = Execution.objects.get(
+        Q(homework=request.data['homeworkId']) & Q(user=request.data['userId']))
     serializer = ExecutionSerializer(execution, many=False)
     return Response(serializer.data)
 
@@ -231,7 +238,8 @@ def loadExecution(request):
 def getExecutionImages(request, execution_id):
     execution = Execution.objects.get(Q(id=execution_id))
     media_type = MediaType.objects.get(Q(name="Photo"))
-    medias = Media.objects.filter(Q(execution=execution.id) & Q(type=media_type))
+    medias = Media.objects.filter(
+        Q(execution=execution.id) & Q(type=media_type))
     serializer = MediaSerializer(medias, many=True)
     return Response(serializer.data)
 
@@ -243,10 +251,11 @@ def loadHomeworks(request):
     homeworks = Assignment.objects.filter(Q(course=courseId))
     userHomeworks = []
     for homework in homeworks:
-        execution = Execution.objects.get(Q(homework=homework.id) & Q(user=userId))
+        execution = Execution.objects.get(
+            Q(homework=homework.id) & Q(user=userId))
         userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
-                         'end_time': homework.end_time, 'score': execution.score,
-                         'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
+                        'end_time': homework.end_time, 'score': execution.score,
+                        'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
         userHomeworks.append(userHomework)
     return Response(userHomeworks)
 
@@ -258,10 +267,11 @@ def loadCourseAllHomeworks(request):
     userHomeworks = []
     for execution in executions:
         try:
-            homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+            homework = Assignment.objects.get(
+                Q(id=execution.homework.id) & Q(course=request.data['courseId']))
             userHomework = {'id': homework.id, 'description': homework.description[0:50]+"...",  'intro': homework.intro, 'start_time': homework.start_time,
-                 'end_time': homework.end_time, 'score': execution.score,
-                 'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
+                            'end_time': homework.end_time, 'score': execution.score,
+                            'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
             userHomeworks.append(userHomework)
         except Exception:
             pass
@@ -274,34 +284,37 @@ def loadCourseHomeworks(request):
         executions = Execution.objects.filter(Q(user=request.data['userId']))
         executions = executions.exclude(Q(finish_time=None))
     else:
-        executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(finish_time=None))
+        executions = Execution.objects.filter(
+            Q(user=request.data['userId']) & Q(finish_time=None))
     userHomeworks = []
     for execution in executions:
         try:
             if (request.data['courseId'] != 0):
-                homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+                homework = Assignment.objects.get(
+                    Q(id=execution.homework.id) & Q(course=request.data['courseId']))
             else:
                 homework = Assignment.objects.get(Q(id=execution.homework.id))
             userHomework = {"id": execution.homework.id, "intro": execution.homework.intro, "description": execution.homework.description[0:50]+"...",
-            'finish_time': execution.finish_time}
+                            'finish_time': execution.finish_time}
             userHomeworks.append(userHomework)
         except Exception:
             pass
     return Response(userHomeworks)
 
 
-
 @api_view(['POST'])
 def loadCourseUnfinishHomeworks(request):
-    executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(finish_time=None))
+    executions = Execution.objects.filter(
+        Q(user=request.data['userId']) & Q(finish_time=None))
     # executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
     userHomeworks = []
     for execution in executions:
         try:
-            homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+            homework = Assignment.objects.get(
+                Q(id=execution.homework.id) & Q(course=request.data['courseId']))
             userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
-                 'end_time': homework.end_time, 'score': execution.score,
-                 'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
+                            'end_time': homework.end_time, 'score': execution.score,
+                            'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
             userHomeworks.append(userHomework)
         except Exception:
             pass
@@ -316,10 +329,11 @@ def loadCourseFinishHomeworks(request):
     userHomeworks = []
     for execution in executions:
         try:
-            homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+            homework = Assignment.objects.get(
+                Q(id=execution.homework.id) & Q(course=request.data['courseId']))
             userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
-                 'end_time': homework.end_time, 'score': execution.score,
-                 'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
+                            'end_time': homework.end_time, 'score': execution.score,
+                            'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
             userHomeworks.append(userHomework)
         except Exception:
             pass
@@ -328,7 +342,8 @@ def loadCourseFinishHomeworks(request):
 
 @api_view(['GET'])
 def getUnfinishHomework(request, user_id):
-    executions = Execution.objects.filter(Q(user=user_id) & Q(finish_time=None))
+    executions = Execution.objects.filter(
+        Q(user=user_id) & Q(finish_time=None))
     homeworks = []
     for execution in executions:
         homework = Assignment.objects.get(Q(id=execution.homework.id))
@@ -340,7 +355,8 @@ def getUnfinishHomework(request, user_id):
 @api_view(['POST'])
 def getStarStatus(request):
     try:
-        executionStar = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
+        executionStar = ExecutionStar.objects.get(
+            Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
         return Response(1)
     except Exception:
         return Response(0)
@@ -358,10 +374,10 @@ def changeStarStatus(request):
         star.save()
         return Response(1)
     else:
-        star = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
+        star = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(
+            execution=request.data['execution_id']))
         star.delete()
     return Response(0)
-
 
 
 @api_view(['GET'])
@@ -373,25 +389,28 @@ def getUserStarExecutions(request, user_id):
         user = Profile.objects.get(Q(id=execution.user.id))
         content_images = []
         media_type = MediaType.objects.get(Q(name="Photo"))
-        medias = Media.objects.filter(Q(execution=execution.id) & Q(type=media_type))
+        medias = Media.objects.filter(
+            Q(execution=execution.id) & Q(type=media_type))
         for media in medias:
             content_images.append(media.get_media())
-        n_execution = { 'id': execution.id,
-                        'user_name': user.name,
-                        'user_image': user.get_image(),
-                        'user_id': user.id,
-                        'finish_time': execution.finish_time,
-                        'content_text': execution.content_text,
-                        'content_images': content_images
-                        }
+        n_execution = {'id': execution.id,
+                       'user_name': user.name,
+                       'user_image': user.get_image(),
+                       'user_id': user.id,
+                       'finish_time': execution.finish_time,
+                       'content_text': execution.content_text,
+                       'content_images': content_images
+                       }
         executions.append(n_execution)
     return Response(executions)
+
 
 @api_view(['POST'])
 def removeStar(request):
     try:
-        star = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
-        star.delete();
+        star = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(
+            execution=request.data['execution_id']))
+        star.delete()
         return Response(1)
     except Exception:
         return Response(0)
@@ -414,13 +433,14 @@ def getExecutionById(request, execution_id):
     execution = Execution.objects.get(Q(id=execution_id))
     content_images = []
     media_type = MediaType.objects.get(Q(name="Photo"))
-    medias = Media.objects.filter(Q(execution=execution.id) & Q(type=media_type))
+    medias = Media.objects.filter(
+        Q(execution=execution.id) & Q(type=media_type))
     for media in medias:
         content_images.append(media.get_media())
-    n_execution = { 'id': execution.id,
-                    'finish_time': execution.finish_time,
-                    'content_text': execution.content_text,
-                    'is_excellent': execution.is_excellent,
-                    'content_images': content_images
-                    }
+    n_execution = {'id': execution.id,
+                   'finish_time': execution.finish_time,
+                   'content_text': execution.content_text,
+                   'is_excellent': execution.is_excellent,
+                   'content_images': content_images
+                   }
     return Response(n_execution)

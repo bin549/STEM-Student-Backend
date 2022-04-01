@@ -6,7 +6,8 @@ from users.models import Profile
 
 class Genre(models.Model):
 
-    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
     name = models.CharField(max_length=200, blank=True, null=True)
 
     def __str__(self):
@@ -15,13 +16,17 @@ class Genre(models.Model):
 
 class Entity(models.Model):
 
-    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
     title = models.CharField(max_length=200, unique=True)
     description = models.TextField(null=True, blank=True)
-    cover_img = models.ImageField(null=True, blank=True, upload_to='profiles/', default="profiles/user-default.png")
+    cover_img = models.ImageField(
+        null=True, blank=True, upload_to='profiles/', default="profiles/user-default.png")
     created_time = models.DateTimeField(auto_now_add=True)
-    owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
-    genre = models.ForeignKey(Genre, null=True, blank=True, on_delete=models.CASCADE)
+    owner = models.ForeignKey(
+        Profile, null=True, blank=True, on_delete=models.CASCADE)
+    genre = models.ForeignKey(
+        Genre, null=True, blank=True, on_delete=models.CASCADE)
     is_visible = models.BooleanField(default=False, null=True)
     serial_number = models.IntegerField()
 
@@ -45,9 +50,12 @@ class Entity(models.Model):
 
 class Selection(models.Model):
 
-    id = models.UUIDField(default=uuid.uuid4, unique=True,primary_key=True, editable=False)
-    user = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
-    course = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
+    user = models.ForeignKey(
+        Profile, null=True, blank=True, on_delete=models.CASCADE)
+    course = models.ForeignKey(
+        Entity, null=True, blank=True, on_delete=models.CASCADE)
     select_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -56,9 +64,12 @@ class Selection(models.Model):
 
 class Wishlist(models.Model):
 
-    id = models.UUIDField(default=uuid.uuid4, unique=True,primary_key=True, editable=False)
-    user = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
-    course = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
+    user = models.ForeignKey(
+        Profile, null=True, blank=True, on_delete=models.CASCADE)
+    course = models.ForeignKey(
+        Entity, null=True, blank=True, on_delete=models.CASCADE)
     collect_time = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -67,7 +78,8 @@ class Wishlist(models.Model):
 
 class Format(models.Model):
 
-    id = models.UUIDField(default=uuid.uuid4, unique=True,primary_key=True, editable=False)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
     name = models.CharField(max_length=200)
 
     def __str__(self):
@@ -76,14 +88,18 @@ class Format(models.Model):
 
 class Lecture(models.Model):
 
-    id = models.UUIDField(default=uuid.uuid4, unique=True,primary_key=True, editable=False)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
     index = models.IntegerField(default=1)
     title = models.CharField(max_length=200)
     created_time = models.DateTimeField(auto_now_add=True)
-    media = models.ImageField(null=True, blank=True, upload_to='profiles/', default="profiles/about-us-video.mp4")
-    format = models.ForeignKey(Format, null=True, blank=True, on_delete=models.CASCADE)
+    media = models.ImageField(
+        null=True, blank=True, upload_to='profiles/', default="profiles/about-us-video.mp4")
+    format = models.ForeignKey(
+        Format, null=True, blank=True, on_delete=models.CASCADE)
     is_preview = models.BooleanField(default=False, null=True)
-    course = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
+    course = models.ForeignKey(
+        Entity, null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
         return '%s' % self.title
@@ -97,12 +113,14 @@ class Lecture(models.Model):
         return ''
 
 
-
 class Comment(models.Model):
 
-    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
-    user = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
-    lecture = models.ForeignKey(Lecture, null=True, blank=True, on_delete=models.CASCADE)
+    id = models.UUIDField(default=uuid.uuid4, unique=True,
+                          primary_key=True, editable=False)
+    user = models.ForeignKey(
+        Profile, null=True, blank=True, on_delete=models.CASCADE)
+    lecture = models.ForeignKey(
+        Lecture, null=True, blank=True, on_delete=models.CASCADE)
     content = models.CharField(max_length=2000)
     comment_time = models.DateTimeField(auto_now_add=True)
 

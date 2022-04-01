@@ -22,6 +22,7 @@ def getUserInfo(request, pk):
     serializer = UserSerializer(profile, many=False)
     return Response(serializer.data)
 
+
 @api_view(['GET'])
 def getUserInfoById(request, user_id):
     profile = Profile.objects.get(id=user_id)

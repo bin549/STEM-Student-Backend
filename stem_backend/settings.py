@@ -99,8 +99,8 @@ USE_I18N = True
 USE_TZ = True
 
 DEFAULT_FILE_STORAGE = 'django_oss_storage.backends.OssMediaStorage'
-OSS_ACCESS_KEY_ID = os.environ.get('OSS_ACCESS_KEY_ID','')
-OSS_ACCESS_KEY_SECRET = os.environ.get('OSS_ACCESS_KEY_SECRET','')
+OSS_ACCESS_KEY_ID = os.environ.get('OSS_ACCESS_KEY_ID', '')
+OSS_ACCESS_KEY_SECRET = os.environ.get('OSS_ACCESS_KEY_SECRET', '')
 OSS_BUCKET_NAME = 'mortem'
 OSS_ENDPOINT = 'oss-cn-guangzhou.aliyuncs.com'
 
