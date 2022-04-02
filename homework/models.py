@@ -1,8 +1,8 @@
 import uuid
 import os
-from course.models import Entity
 from django.db import models
 from users.models import Profile
+from course.models import Entity
 
 
 class Assignment(models.Model):

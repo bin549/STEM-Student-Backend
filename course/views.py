@@ -239,8 +239,7 @@ def setPreviewLecture(request):
     lecture = Lecture.objects.get(Q(id=request.data['lectureId']))
     course = Entity.objects.get(Q(id=lecture.course.id))
     try:
-        courseLecture = Lecture.objects.get(
-            Q(is_preview=True) & Q(course=course.id))
+        courseLecture = Lecture.objects.get(Q(is_preview=True) & Q(course=course.id))
         courseLecture.is_preview = False
         courseLecture.save()
     except Exception:
@@ -287,8 +286,7 @@ def registerCourse(request):
             return Response('Register Before', status=status.HTTP_201_CREATED)
     except Exception:
         try:
-            wishlist = Wishlist.objects.get(
-                Q(user=user.id) & Q(course=course.id))
+            wishlist = Wishlist.objects.get(Q(user=user.id) & Q(course=course.id))
             wishlist.delete()
         except Exception:
             print('wishlist was deleted!')
@@ -329,8 +327,7 @@ def getWishlistStatus(request):
 @api_view(['POST'])
 def addWishlist(request):
     try:
-        wishlist = Wishlist.objects.get(
-            Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        wishlist = Wishlist.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
         return Response(0)
     except Exception:
         new_wishlist = Wishlist()
@@ -346,8 +343,7 @@ def addWishlist(request):
 @api_view(['POST'])
 def removeWishlist(request):
     try:
-        wishlist = Wishlist.objects.get(
-            Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        wishlist = Wishlist.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
         wishlist.delete()
         return Response(1)
     except Exception:

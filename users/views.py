@@ -1,11 +1,11 @@
 import datetime
-from .models import Profile, Type, Message, Follow, Note
-from .serializers import UserSerializer, TypeSerializer, MessageSerializer, NoteSerializer
 from django.db.models import Q
 from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from .models import Profile, Type, Message, Follow, Note
+from .serializers import UserSerializer, TypeSerializer, MessageSerializer, NoteSerializer
 
 
 class AllUsers(APIView):
@@ -92,17 +92,15 @@ def createMessage(request):
     return Response(1)
 
 
-
 @api_view(['GET'])
 def getInboxUnreadCount(request, user_name):
-    print(user_name)
     user = Profile.objects.get(name=user_name)
     messages = Message.objects.filter(Q(recipient=user.id) & Q(is_read=False))
     return Response(messages.count())
 
+
 @api_view(['GET'])
 def getInboxReadCount(request, user_name):
-    print(user_name)
     user = Profile.objects.get(name=user_name)
     messages = Message.objects.filter(Q(recipient=user.id) & Q(is_read=True))
     return Response(messages.count())

@@ -50,7 +50,6 @@ class MessageSerializer(serializers.ModelSerializer):
         )
 
 
-
 class NoteSerializer(serializers.ModelSerializer):
 
     class Meta:

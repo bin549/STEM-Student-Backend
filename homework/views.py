@@ -64,19 +64,6 @@ def getSelectedCourseHomeworks(request, course_id):
 
 
 @api_view(['POST'])
-def loadExecution(request):
-    homeworkId = request.data['homeworkId']
-    executions = Execution.objects.filter(Q(homework=homeworkId))
-    userHomeworks = []
-    for execution in executions:
-        user = Profile.objects.get(Q(id=homework.user))
-        userHomework = {'username': user.name, 'finish_time': execution.finish_time,
-                        'is_excellent': execution.is_excellent, 'score': execution.score}
-        userHomeworks.append(userHomework)
-    return Response(1)
-
-
-@api_view(['POST'])
 def loadUserExecution(request):
     userId = request.data['userId']
     homeworkId = request.data['homeworkId']
@@ -134,8 +121,7 @@ def getCheckedExecutions(request):
 
 @api_view(['GET'])
 def getExcellentExecutions(request, homework_id):
-    executions = Execution.objects.filter(
-        Q(homework=homework_id) & Q(is_excellent=True))
+    executions = Execution.objects.filter(Q(homework=homework_id) & Q(is_excellent=True))
     n_executions = []
     for execution in executions:
         user = Profile.objects.get(Q(id=execution.user.id))
@@ -228,10 +214,22 @@ def uploadHomework(request):
 
 @api_view(['POST'])
 def loadExecution(request):
-    execution = Execution.objects.get(
-        Q(homework=request.data['homeworkId']) & Q(user=request.data['userId']))
+    execution = Execution.objects.get(Q(homework=request.data['homeworkId']) & Q(user=request.data['userId']))
     serializer = ExecutionSerializer(execution, many=False)
     return Response(serializer.data)
+
+
+@api_view(['POST'])
+def loadExecution(request):
+    homeworkId = request.data['homeworkId']
+    executions = Execution.objects.filter(Q(homework=homeworkId))
+    userHomeworks = []
+    for execution in executions:
+        user = Profile.objects.get(Q(id=homework.user))
+        userHomework = {'username': user.name, 'finish_time': execution.finish_time,
+                        'is_excellent': execution.is_excellent, 'score': execution.score}
+        userHomeworks.append(userHomework)
+    return Response(1)
 
 
 @api_view(['GET'])
@@ -251,8 +249,7 @@ def loadHomeworks(request):
     homeworks = Assignment.objects.filter(Q(course=courseId))
     userHomeworks = []
     for homework in homeworks:
-        execution = Execution.objects.get(
-            Q(homework=homework.id) & Q(user=userId))
+        execution = Execution.objects.get(Q(homework=homework.id) & Q(user=userId))
         userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
                         'end_time': homework.end_time, 'score': execution.score,
                         'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
@@ -267,8 +264,7 @@ def loadCourseAllHomeworks(request):
     userHomeworks = []
     for execution in executions:
         try:
-            homework = Assignment.objects.get(
-                Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+            homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
             userHomework = {'id': homework.id, 'description': homework.description[0:50]+"...",  'intro': homework.intro, 'start_time': homework.start_time,
                             'end_time': homework.end_time, 'score': execution.score,
                             'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
@@ -290,8 +286,7 @@ def loadCourseHomeworks(request):
     for execution in executions:
         try:
             if (request.data['courseId'] != 0):
-                homework = Assignment.objects.get(
-                    Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+                homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
             else:
                 homework = Assignment.objects.get(Q(id=execution.homework.id))
             userHomework = {"id": execution.homework.id, "intro": execution.homework.intro, "description": execution.homework.description[0:50]+"...",
@@ -304,14 +299,12 @@ def loadCourseHomeworks(request):
 
 @api_view(['POST'])
 def loadCourseUnfinishHomeworks(request):
-    executions = Execution.objects.filter(
-        Q(user=request.data['userId']) & Q(finish_time=None))
+    executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(finish_time=None))
     # executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
     userHomeworks = []
     for execution in executions:
         try:
-            homework = Assignment.objects.get(
-                Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+            homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
             userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
                             'end_time': homework.end_time, 'score': execution.score,
                             'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}

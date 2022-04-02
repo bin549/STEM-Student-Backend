@@ -59,6 +59,7 @@ class Message(models.Model):
 
 
 class Follow(models.Model):
+
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.OneToOneField(Profile, on_delete=models.CASCADE, unique=False, null=True, blank=True)
     other_user = models.OneToOneField(Profile, on_delete=models.CASCADE,  unique=False, null=True, blank=True, related_name="other_user")
@@ -66,6 +67,7 @@ class Follow(models.Model):
 
 
 class Note(models.Model):
+
     id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
     user = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=200, null=True, blank=True)

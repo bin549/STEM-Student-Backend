@@ -32,6 +32,7 @@ class ExecutionSerializer(serializers.ModelSerializer):
             "user",
         )
 
+
 class MediaSerializer(serializers.ModelSerializer):
 
     class Meta:
