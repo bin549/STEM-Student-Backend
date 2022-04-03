@@ -275,8 +275,7 @@ def getLectureComments(request, lecture_id):
 def registerCourse(request):
     try:
         user = Profile.objects.get(Q(id=request.data['userId']))
-        course = Entity.objects.get(
-            Q(serial_number=request.data['serialNumber']))
+        course = Entity.objects.get(Q(serial_number=request.data['serialNumber']))
     except Exception:
         return Response('Not Existed', status=status.HTTP_201_CREATED)
     try:
@@ -307,8 +306,7 @@ def registerCourse(request):
 @api_view(['POST'])
 def getCourseStatus(request):
     try:
-        selection = Selection.objects.get(
-            Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
+        selection = Selection.objects.get(Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
         return Response(1)
     except Exception:
         return Response(0)
@@ -317,8 +315,7 @@ def getCourseStatus(request):
 @api_view(['POST'])
 def getWishlistStatus(request):
     try:
-        wishlist = Wishlist.objects.get(
-            Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
+        wishlist = Wishlist.objects.get(Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
         return Response(1)
     except Exception:
         return Response(0)
@@ -375,16 +372,13 @@ def setCourseVisible(request):
 @api_view(['POST'])
 def deleteCourseStudent(request):
     try:
-        selection = Selection.objects.get(
-            Q(user=request.data['userId']) & Q(course=request.data['courseId']))
+        selection = Selection.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
     except Exception:
         return Response('Selection Existed', status=status.HTTP_201_CREATED)
     try:
-        homeworks = Assignment.objects.filter(
-            Q(course=request.data['courseId']))
+        homeworks = Assignment.objects.filter(Q(course=request.data['courseId']))
         for homework in homeworks:
-            execution = Execution.objects.get(
-                Q(user=request.data['userId']) & Q(homework=homework.id))
+            execution = Execution.objects.get(Q(user=request.data['userId']) & Q(homework=homework.id))
             execution.delete()
     except Exception:
         return Response('Homework Not Existed', status=status.HTTP_201_CREATED)
@@ -400,8 +394,7 @@ def addCourseStudent(request):
     except Exception:
         return Response('user Not Existed', status=status.HTTP_201_CREATED)
     try:
-        Selection.objects.get(Q(user=request.data['userId']) & Q(
-            course=request.data['courseId']))
+        Selection.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
         return Response('Selection Existed', status=status.HTTP_201_CREATED)
     except Exception:
         selection = Selection()
@@ -425,14 +418,12 @@ def addCourseLecture(request):
     except Exception:
         return Response('Format Not Existed', status=status.HTTP_201_CREATED)
     fileName = request.data['fileName']
-
     photo_format = ('png', 'jpg', 'bmp', 'gif')
     video_format = ('mp4', 'mov')
     if fileName.split('.')[-1].lower() in photo_format:
         format = Format.objects.get(Q(name='Photo'))
     elif fileName.split('.')[-1].lower() in video_format:
         format = Format.objects.get(Q(name='Video'))
-
     lecture = Lecture()
     lecture.title = request.data['title']
     lecture.course = course

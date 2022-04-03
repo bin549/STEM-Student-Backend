@@ -22,7 +22,6 @@ class UserSerializer(serializers.ModelSerializer):
         )
 
 
-
 class TypeSerializer(serializers.ModelSerializer):
 
     class Meta:
