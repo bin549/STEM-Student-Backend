@@ -26,6 +26,6 @@ urlpatterns = [
     path('getFollowersId/<str:user_id>/', views.getFollowersId),
     path('getFollowingsId/<str:user_id>/', views.getFollowingsId),
     path('getNotes/<str:user_id>/', views.getNotes),
-    path('createNote/', views.createNote), 
+    path('createNote/', views.createNote),
     path('getNoteById/<str:note_id>/', views.getNoteById),
 ]
