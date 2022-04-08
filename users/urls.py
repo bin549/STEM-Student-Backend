@@ -9,7 +9,7 @@ urlpatterns = [
     path('getUsersByTypeName/<str:type_name>/', views.getUsersByTypeName),
     path('addUser/', views.addUser),
     path('getUserNameById/<str:user_id>/', views.getUserNameById),
-    path('getUserById/<str:user_id>/', views.getUserById), 
+    path('getUserById/<str:user_id>/', views.getUserById),
     path('updateUser/', views.updateUser),
     path('getUserInfoById/<str:user_id>/', views.getUserInfoById),
     path('getUserTypeById/<str:user_type_id>/', views.getUserTypeById),
@@ -26,6 +26,6 @@ urlpatterns = [
     path('getFollowersId/<str:user_id>/', views.getFollowersId),
     path('getFollowingsId/<str:user_id>/', views.getFollowingsId),
     path('getNotes/<str:user_id>/', views.getNotes),
-    path('createNote/', views.createNote),
+    path('createNote/', views.createNote), 
     path('getNoteById/<str:note_id>/', views.getNoteById),
 ]
