@@ -29,5 +29,3 @@ urlpatterns = [
     path('createNote/', views.createNote),
     path('getNoteById/<str:note_id>/', views.getNoteById),
 ]
-
- 
