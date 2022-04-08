@@ -9,7 +9,7 @@ urlpatterns = [
     path('getUsersByTypeName/<str:type_name>/', views.getUsersByTypeName),
     path('addUser/', views.addUser),
     path('getUserNameById/<str:user_id>/', views.getUserNameById),
-    path('getUserById/<str:user_id>/', views.getUserById),
+    path('getUserById/<str:user_id>/', views.getUserById), 
     path('updateUser/', views.updateUser),
     path('getUserInfoById/<str:user_id>/', views.getUserInfoById),
     path('getUserTypeById/<str:user_type_id>/', views.getUserTypeById),
