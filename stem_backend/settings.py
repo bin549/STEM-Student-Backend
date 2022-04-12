@@ -3,13 +3,9 @@ from pathlib import Path
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-# SECRET_KEY = os.environ.get("SECRET_KEY")
-# DEBUG = int(os.environ.get("DEBUG", default=0))
-# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
-
-SECRET_KEY = 'django-insecure-3ufbu_fctt-@c3@%5r&nns3@0m8=&g*7$f!6-&ry$own9=k145'
-DEBUG = True
-ALLOWED_HOSTS = ["47.106.92.143"]
+SECRET_KEY = os.environ.get("SECRET_KEY")
+DEBUG = int(os.environ.get("DEBUG", default=0))
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -72,7 +68,7 @@ DATABASES = {
         'NAME': 'stem',
         'USER': "postgres",
         'PASSWORD': "__2018bb",
-        'HOST': "127.0.0.1",
+        'HOST': "47.106.92.143",
         'PORT': '5432',
     }
 }
@@ -98,10 +94,8 @@ USE_I18N = True
 USE_TZ = True
 
 DEFAULT_FILE_STORAGE = 'django_oss_storage.backends.OssMediaStorage'
-# OSS_ACCESS_KEY_ID = os.environ.get('OSS_ACCESS_KEY_ID', '')
-# OSS_ACCESS_KEY_SECRET = os.environ.get('OSS_ACCESS_KEY_SECRET', '')
-OSS_ACCESS_KEY_ID = LTAI5tH3N9bs5veG3cn84pNR
-OSS_ACCESS_KEY_SECRET = LusobjZXgYqPptpawKOJGP46VRF5c3
+OSS_ACCESS_KEY_ID = os.environ.get('OSS_ACCESS_KEY_ID', '')
+OSS_ACCESS_KEY_SECRET = os.environ.get('OSS_ACCESS_KEY_SECRET', '')-
 OSS_BUCKET_NAME = 'mortem'
 OSS_ENDPOINT = 'oss-cn-guangzhou.aliyuncs.com'
 
