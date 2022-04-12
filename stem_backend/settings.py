@@ -87,7 +87,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
- 
+
 LANGUAGE_CODE = 'en-us'
 TIME_ZONE = 'UTC'
 USE_I18N = True
@@ -101,4 +101,4 @@ OSS_ENDPOINT = 'oss-cn-guangzhou.aliyuncs.com'
 
 MEDIA_URL = 'media/'
 STATIC_URL = '/static/'
-MEDIA_ROOT = BASE_DIR / 'media/'
+MEDIA_ROOT = BASE_DIR / 'media/' 
