@@ -3,7 +3,6 @@ from course import views
 
 
 urlpatterns = [
-    path('getAllCourse/', views.AllCourse.as_view()),
     path('getAllVisibleCourse/', views.AllVisibleCourse.as_view()),
     path('getRecomendedCourse/', views.getRecomendedCourse),
     path('getAllCollection/', views.AllCollection.as_view()),
@@ -11,10 +10,7 @@ urlpatterns = [
     path('getCourseLectures/<str:course_id>/', views.getCourseLectures),
     path('course/<str:course_name>/', views.getCourseDetail),
     path('courses/<slug:genre_slug>/', views.GenreDetail.as_view()),
-    path('getOwnerCourse/<str:user_id>/', views.getOwnerCourse),
-    path('createCourse/', views.createCourse),
     path('updateCourse/', views.updateCourse),
-    path('deleteCourse/', views.deleteCourse),
     path('registerCourse/', views.registerCourse),
     path('getCourseStatus/', views.getCourseStatus),
     path('course_student/<slug:course_slug>/', views.SelectionUser.as_view()),
@@ -26,7 +22,6 @@ urlpatterns = [
     path('addWishlist/', views.addWishlist),
     path('removeWishlist/', views.removeWishlist),
     path('getCourseVisibleStatus/', views.getCourseVisibleStatus),
-    path('setCourseVisible/', views.setCourseVisible),
     path('addCourseStudent/', views.addCourseStudent),
     path('deleteCourseStudent/', views.deleteCourseStudent),
     path('addCourseLecture/', views.addCourseLecture),

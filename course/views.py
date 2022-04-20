@@ -15,14 +15,6 @@ from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer,
 from .utils import paginateCourses
 
 
-class AllCourse(APIView):
-
-    def get(self, request, format=None):
-        courses = Entity.objects.all()[0:4]
-        serializer = CourseSerializer(courses, many=True)
-        return Response(serializer.data)
-
-
 class AllVisibleCourse(APIView):
 
     def get(self, request, format=None):
@@ -140,13 +132,6 @@ def getUserWishlist(request, user_id):
 
 
 @api_view(['GET'])
-def getOwnerCourse(request, user_id):
-    courses = Entity.objects.filter(Q(owner=user_id))
-    serializer = CourseSerializer(courses, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
 def getCourse(request, course_id):
     courses = Entity.objects.get(Q(id=course_id))
     serializer = CourseSerializer(courses, many=False)
@@ -187,22 +172,6 @@ class SelectionUser(APIView):
 
 
 @api_view(['POST'])
-def createCourse(request):
-    future_course = Entity()
-    owner = Profile.objects.get(Q(id=request.data['userId']))
-    genre = Genre.objects.get(Q(name=request.data['genre']))
-    future_course.owner = owner
-    future_course.title = request.data['title']
-    future_course.description = request.data['description']
-    future_course.cover_img = request.data['cover_img']
-    future_course.created_time = datetime.timedelta(days=30)
-    future_course.genre = genre
-    future_course.serial_number = int(random.random()*1000000)
-    future_course.save()
-    return Response('createCourse!')
-
-
-@api_view(['POST'])
 def updateCourse(request):
     request.data['genre']
     course = Entity.objects.get(id=request.data['course_id'])
@@ -212,19 +181,6 @@ def updateCourse(request):
     course.description = request.data['description']
     course.save()
     return Response('updateCourse!')
-
-
-@api_view(['POST'])
-def deleteCourse(request):
-    course = Entity.objects.get(Q(id=request.data['courseId']))
-    selections = Selection.objects.filter(Q(course=course.id))
-    wishlists = Wishlist.objects.filter(Q(course=course.id))
-    lectures = Lecture.objects.filter(Q(course=course.id))
-    selections.delete()
-    wishlists.delete()
-    lectures.delete()
-    course.delete()
-    return Response('Course was deleted!')
 
 
 @api_view(['POST'])
@@ -354,17 +310,6 @@ def getCourseVisibleStatus(request):
         if course.is_visible:
             return Response(1)
         return Response(0)
-    except Exception:
-        return Response(0)
-
-
-@api_view(['POST'])
-def setCourseVisible(request):
-    try:
-        course = Entity.objects.get(Q(id=request.data['courseId']))
-        course.is_visible = request.data['isVisible']
-        course.save()
-        return Response(1)
     except Exception:
         return Response(0)
 

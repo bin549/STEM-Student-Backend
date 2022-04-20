@@ -1,11 +1,12 @@
 import os
 from pathlib import Path
-
+from conf.env import *
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
-DEBUG = int(os.environ.get("DEBUG", default=0))
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+
+DEBUG = locals().get('DEBUG', True)
+ALLOWED_HOSTS = locals().get('ALLOWED_HOSTS', ['*'])
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -64,12 +65,12 @@ WSGI_APPLICATION = 'stem_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'stem',
-        'USER': "postgres",
-        'PASSWORD': "__2018bb",
-        'HOST': "47.106.92.143",
-        'PORT': '5432',
+        'ENGINE': DATABASE_ENGINE,
+        'NAME': DATABASE_NAME,
+        'USER': DATABASE_USER,
+        'PASSWORD': DATABASE_PASSWORD,
+        'HOST': DATABASE_HOST,
+        'PORT': DATABASE_PORT,
     }
 }
 
