@@ -136,12 +136,6 @@ def SetMessageIsReadStatus(request, message_id):
     return Response(1)
 
 
-@api_view(['GET'])
-def deleteMessage(request, message_id):
-    message = Message.objects.get(id=message_id)
-    message.delete()
-    return Response(1)
-
 
 @api_view(['POST'])
 def getFollowStatus(request):

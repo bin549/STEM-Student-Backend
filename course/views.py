@@ -159,35 +159,6 @@ class CourseDetail(APIView):
         return Response(serializer.data)
 
 
-class SelectionUser(APIView):
-
-    def get(self, request, course_slug, format=None):
-        selection = Selection.objects.filter(Q(course=course_slug))
-        students = []
-        for s in selection:
-            student = Profile.objects.get(Q(id=s.user.id))
-            students.append(student)
-        serializer = UserSerializer(students, many=True)
-        return Response(serializer.data)
-
-
-@api_view(['POST'])
-def updateCourse(request):
-    request.data['genre']
-    course = Entity.objects.get(id=request.data['course_id'])
-    course.title = request.data['title']
-    course.cover_img = request.data['cover_img']
-    course.title = request.data['title']
-    course.description = request.data['description']
-    course.save()
-    return Response('updateCourse!')
-
-
-@api_view(['POST'])
-def deleteLecture(request):
-    lecture = Lecture.objects.get(Q(id=request.data['lectureId']))
-    lecture.delete()
-    return Response('lecture was deleted!')
 
 
 @api_view(['POST'])
@@ -315,23 +286,6 @@ def getCourseVisibleStatus(request):
 
 
 @api_view(['POST'])
-def deleteCourseStudent(request):
-    try:
-        selection = Selection.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
-    except Exception:
-        return Response('Selection Existed', status=status.HTTP_201_CREATED)
-    try:
-        homeworks = Assignment.objects.filter(Q(course=request.data['courseId']))
-        for homework in homeworks:
-            execution = Execution.objects.get(Q(user=request.data['userId']) & Q(homework=homework.id))
-            execution.delete()
-    except Exception:
-        return Response('Homework Not Existed', status=status.HTTP_201_CREATED)
-    selection.delete()
-    return Response(1)
-
-
-@api_view(['POST'])
 def addCourseStudent(request):
     try:
         course = Entity.objects.get(Q(id=request.data['courseId']))
@@ -354,29 +308,6 @@ def addCourseStudent(request):
             execution.user = user
             execution.save()
         return Response(1)
-
-
-@api_view(['POST'])
-def addCourseLecture(request):
-    try:
-        course = Entity.objects.get(Q(id=request.data['courseId']))
-    except Exception:
-        return Response('Format Not Existed', status=status.HTTP_201_CREATED)
-    fileName = request.data['fileName']
-    photo_format = ('png', 'jpg', 'bmp', 'gif')
-    video_format = ('mp4', 'mov')
-    if fileName.split('.')[-1].lower() in photo_format:
-        format = Format.objects.get(Q(name='Photo'))
-    elif fileName.split('.')[-1].lower() in video_format:
-        format = Format.objects.get(Q(name='Video'))
-    lecture = Lecture()
-    lecture.title = request.data['title']
-    lecture.course = course
-    lecture.format = format
-    lecture.media = fileName
-    lecture.created_time = datetime.timedelta(days=30)
-    lecture.save()
-    return Response(1)
 
 
 @api_view(['POST'])
