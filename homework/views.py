@@ -12,28 +12,6 @@ from .models import Assignment, Execution, MediaType, Media, ExecutionStar
 
 
 @api_view(['POST'])
-def addHomework(request):
-    try:
-        course = Entity.objects.get(Q(id=request.data['courseId']))
-    except Exception:
-        return Response(0)
-    new_homework = Assignment()
-    new_homework.intro = request.data['intro']
-    new_homework.description = request.data['description']
-    new_homework.start_time = request.data['start_time']
-    new_homework.end_time = request.data['end_time']
-    new_homework.course = course
-    new_homework.save()
-    selections = Selection.objects.filter(Q(course=request.data['courseId']))
-    for selection in selections:
-        execution = Execution()
-        execution.homework = new_homework
-        execution.user = selection.user
-        execution.save()
-    return Response(1)
-
-
-@api_view(['POST'])
 def deleteHomework(request):
     try:
         homework = Assignment.objects.get(Q(id=request.data['homeworkId']))
@@ -79,14 +57,6 @@ def getExecutionsById(request, homework_id):
                        'is_excellent': execution.is_excellent}
         n_executions.append(n_execution)
     return Response(n_executions)
-
-
-@api_view(['POST'])
-def setExecutionScore(request):
-    execution = Execution.objects.get(Q(id=request.data['id']))
-    execution.score = request.data['score']
-    execution.save()
-    return Response(1)
 
 
 @api_view(['GET'])

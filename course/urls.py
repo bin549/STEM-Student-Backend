@@ -15,7 +15,6 @@ urlpatterns = [
     path('getAllGenres/', views.AllGenre.as_view()),
     path('getAllSelection/', views.AllSelection.as_view()),
     path('getUserWishlist/<str:user_id>/', views.getUserWishlist),
-    path('getSerialNumber/', views.getSerialNumber),
     path('getWishlistStatus/', views.getWishlistStatus),
     path('addWishlist/', views.addWishlist),
     path('removeWishlist/', views.removeWishlist),
@@ -28,8 +27,6 @@ urlpatterns = [
     path('getCourseOwner/<str:course_id>/', views.getCourseOwner),
     path('getCourse/<str:course_id>/', views.getCourse),
     path('getCourseGenre/<str:genre_id>/', views.getCourseGenre),
-    path('setPreviewLecture/', views.setPreviewLecture),
-    path('getPreviewLectureByCourseId/<str:course_id>/', views.getPreviewLectureByCourseId),
     path('getCourseLecture/', views.getCourseLecture),
     path('getLectureFormat/<str:format_id>/', views.getLectureFormat),
     path('loadCurrentSelectCourseTitle/<str:course_id>/', views.loadCurrentSelectCourseTitle),
@@ -39,4 +36,5 @@ urlpatterns = [
     path('getLectureCommentsByUserId/<str:user_id>/', views.getLectureCommentsByUserId),
     path('getLectureById/<str:lecture_id>/', views.getLectureById),
     path('deleteCommentById/<str:comment_id>/', views.deleteCommentById),
+    path('getPreviewLecture/', views.LectureAPI.as_view()),
 ]

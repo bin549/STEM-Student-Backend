@@ -15,6 +15,20 @@ from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer,
 from .utils import paginateCourses
 
 
+class LectureAPI(APIView):
+
+    def get(self, request, format=None):
+        pass
+
+    def post(self, request, format=None):
+        if request.data["mode"] == "preview":
+            lectures = Lecture.objects.filter(Q(course=request.data["course_id"]))
+            lecture = lectures.get(Q(is_preview=True))
+            serializer = LectureSerializer(lecture, many=False)
+            return Response(serializer.data)
+
+
+
 class AllVisibleCourse(APIView):
 
     def get(self, request, format=None):
@@ -157,38 +171,6 @@ class CourseDetail(APIView):
         course = self.get_object(genre_slug, course_slug)
         serializer = CourseSerializer(course)
         return Response(serializer.data)
-
-
-
-
-@api_view(['POST'])
-def setPreviewLecture(request):
-    lecture = Lecture.objects.get(Q(id=request.data['lectureId']))
-    course = Entity.objects.get(Q(id=lecture.course.id))
-    try:
-        courseLecture = Lecture.objects.get(Q(is_preview=True) & Q(course=course.id))
-        courseLecture.is_preview = False
-        courseLecture.save()
-    except Exception:
-        pass
-    lecture.is_preview = True
-    lecture.save()
-    return Response('Set was success!')
-
-
-@api_view(['POST'])
-def getPreviewLectureByCourseId(request, course_id):
-    lectures = Lecture.objects.filter(Q(course=course_id))
-    lecture = lectures.get(Q(is_preview=True))
-    serializer = LectureSerializer(lecture, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def getSerialNumber(request):
-    courses = Entity.objects.filter(Q(owner=user_id))
-    serializer = CourseSerializer(courses, many=True)
-    return Response(serializer.data)
 
 
 @api_view(['GET'])

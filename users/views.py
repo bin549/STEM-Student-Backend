@@ -62,11 +62,6 @@ def getUsersByTypeName(request, type_name):
     return Response(serializer.data)
 
 
-@api_view(['POST'])
-def addUser(request):
-    print(request.data)
-    return Response(1)
-
 
 @api_view(['POST'])
 def updateUser(request):

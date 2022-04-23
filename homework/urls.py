@@ -3,7 +3,6 @@ from homework import views
 
 
 urlpatterns = [
-    path('addHomework/', views.addHomework),
     path('deleteHomework/', views.deleteHomework),
     path('getAllHomework/', views.AllHomework.as_view()),
     path('loadHomeworks/', views.loadHomeworks),
@@ -19,7 +18,6 @@ urlpatterns = [
     path('getSelectedCourseHomeworks/<str:course_id>/', views.getSelectedCourseHomeworks),
     path('loadExecution/', views.loadExecution),
     path('loadUserExecution/', views.loadUserExecution),
-    path('setExecutionScore/', views.setExecutionScore),
     path('getExecutionImages/<str:execution_id>/', views.getExecutionImages),
     path('getCheckedExecutions/', views.getCheckedExecutions),
     path('loadExcellentExecutions/', views.loadExcellentExecutions),
