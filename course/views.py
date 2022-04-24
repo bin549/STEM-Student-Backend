@@ -124,11 +124,40 @@ class LectureAPI(APIView):
 class SelectionAPI(APIView):
 
     def post(self, request, format=None):
-        try:
-            selection = Selection.objects.get(Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
-            return Response(1)
-        except Exception:
-            return Response(0)
+        if "serial_number" in request.data:
+            try:
+                user = Profile.objects.get(Q(id=request.data['user_id']))
+                course = Entity.objects.get(Q(serial_number=request.data['serial_number']))
+            except Exception:
+                return Response('Not Existed', status=status.HTTP_201_CREATED)
+            try:
+                existed_selection = Selection.objects.get(Q(user=user.id) & Q(course=course.id))
+                if existed_selection:
+                    return Response('Register Before', status=status.HTTP_201_CREATED)
+            except Exception:
+                try:
+                    wishlist = Wishlist.objects.get(Q(user=user.id) & Q(course=course.id))
+                    wishlist.delete()
+                except Exception:
+                    print('wishlist was deleted!')
+                new_selection = Selection()
+                new_selection.user = user
+                new_selection.course = course
+                new_selection.select_time = datetime.timedelta(days=30)
+                new_selection.save()
+                homeworks = Assignment.objects.filter(Q(course=course.id))
+                for homework in homeworks:
+                    execution = Execution()
+                    execution.homework = homework
+                    execution.user = user
+                    execution.save()
+            return Response('Register Success.')
+        else:
+            try:
+                selection = Selection.objects.get(Q(user=request.data['user_id']) & Q(course=request.data['course_id']))
+                return Response(1)
+            except Exception:
+                return Response(0)
 
 
 class CommentAPI(APIView):
@@ -297,37 +326,6 @@ class CourseDetail(APIView):
         serializer = CourseSerializer(course)
         return Response(serializer.data)
 
-
-@api_view(['POST'])
-def registerCourse(request):
-    try:
-        user = Profile.objects.get(Q(id=request.data['userId']))
-        course = Entity.objects.get(Q(serial_number=request.data['serialNumber']))
-    except Exception:
-        return Response('Not Existed', status=status.HTTP_201_CREATED)
-    try:
-        existed_selection = Selection.objects.get(
-            Q(user=user.id) & Q(course=course.id))
-        if existed_selection:
-            return Response('Register Before', status=status.HTTP_201_CREATED)
-    except Exception:
-        try:
-            wishlist = Wishlist.objects.get(Q(user=user.id) & Q(course=course.id))
-            wishlist.delete()
-        except Exception:
-            print('wishlist was deleted!')
-        new_selection = Selection()
-        new_selection.user = user
-        new_selection.course = course
-        new_selection.select_time = datetime.timedelta(days=30)
-        new_selection.save()
-        homeworks = Assignment.objects.filter(Q(course=course.id))
-        for homework in homeworks:
-            execution = Execution()
-            execution.homework = homework
-            execution.user = user
-            execution.save()
-    return Response('Register Success.')
 
 
 @api_view(['POST'])

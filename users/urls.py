@@ -9,7 +9,6 @@ urlpatterns = [
     path('getUserNameById/<str:user_id>/', views.getUserNameById),
     path('updateUser/', views.updateUser),
     path('getUserTypeById/<str:user_type_id>/', views.getUserTypeById),
-    path('createMessage/', views.createMessage),
     path('getInboxReadCount/<str:user_name>/', views.getInboxReadCount),
     path('getInboxUnreadCount/<str:user_name>/', views.getInboxUnreadCount),
     path('getMessages/', views.getMessages),
@@ -25,4 +24,5 @@ urlpatterns = [
     path('getNotes/<str:user_id>/', views.NoteAPI.as_view()),
     path('getNoteById/', views.NoteAPI.as_view()),
     path('createNote/', views.NoteAPI.as_view()),
+    path('createMessage/', views.MessageAPI.as_view()),
 ]

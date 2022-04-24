@@ -1,7 +1,7 @@
 import uuid
 import os
-from django.db import models
 from users.models import Profile
+from django.db import models
 
 
 class Genre(models.Model):

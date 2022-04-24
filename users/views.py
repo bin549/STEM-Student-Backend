@@ -82,6 +82,23 @@ class NoteAPI(APIView):
             return Response(note.id)
 
 
+class MessageAPI(APIView):
+
+    def post(self, request, format=None):
+        message = Message()
+        message.sender = Profile.objects.get(id=request.data['sender'])
+        message.title = request.data['title']
+        message.content = request.data['content']
+        message.is_read = False
+        message.created_time = datetime.timedelta(days=30)
+        user_type = Type.objects.get(name='manager')
+        recipients = Profile.objects.filter(user_type=user_type.id)
+        for recipient in recipients:
+            message.recipient = recipient
+            message.save()
+        return Response(1)
+
+
 @api_view(['GET'])
 def getUserByUserName(request, pk):
     profile = Profile.objects.get(name=pk)
@@ -128,23 +145,6 @@ def updateUser(request):
     user.profile_image = request.data['profile_image']
     user.save()
     return Response(1)
-
-
-@api_view(['POST'])
-def createMessage(request):
-    message = Message()
-    message.sender = Profile.objects.get(id=request.data['sender'])
-    message.title = request.data['title']
-    message.content = request.data['content']
-    message.is_read = False
-    message.created_time = datetime.timedelta(days=30)
-    user_type = Type.objects.get(name='manager')
-    recipients = Profile.objects.filter(user_type=user_type.id)
-    for recipient in recipients:
-        message.recipient = recipient
-        message.save()
-    return Response(1)
-
 
 @api_view(['GET'])
 def getInboxUnreadCount(request, user_name):
