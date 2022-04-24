@@ -75,30 +75,53 @@ class MediaAPI(APIView):
 
 class StarAPI(APIView):
 
+    def get(self, request, user_id, format=None):
+        stars = ExecutionStar.objects.filter(Q(user=user_id))
+        executions = []
+        for star in stars:
+            execution = Execution.objects.get(Q(id=star.execution.id))
+            user = Profile.objects.get(Q(id=execution.user.id))
+            content_images = []
+            media_type = MediaType.objects.get(Q(name="Photo"))
+            medias = Media.objects.filter(
+                Q(execution=execution.id) & Q(type=media_type))
+            for media in medias:
+                content_images.append(media.get_media())
+            n_execution = {
+                            'id': execution.id,
+                           'user_name': user.name,
+                           'user_image': user.get_image(),
+                           'user_id': user.id,
+                           'finish_time': execution.finish_time,
+                           'content_text': execution.content_text,
+                           'content_images': content_images
+                           }
+            executions.append(n_execution)
+        return Response(executions)
+
     def post(self, request, format=None):
-        if request.data["mode"] == "fetch":
-            try:
-                ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
-                return Response(1)
-            except Exception:
+        if "mode" in request.data:
+            if request.data["mode"] == "fetch":
+                try:
+                    ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
+                    return Response(1)
+                except Exception:
+                    return Response(0)
+            elif request.data["mode"] == "update":
+                if request.data["status"]:
+                    star = ExecutionStar()
+                    user = Profile.objects.get(Q(id=request.data['user_id']))
+                    execution = Execution.objects.get(Q(id=request.data['execution_id']))
+                    star.user = user
+                    star.execution = execution
+                    star.star_time = datetime.timedelta(days=30)
+                    star.save()
+                    return Response(1)
+                else:
+                    star = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
+                    star.delete()
                 return Response(0)
-        elif request.data["mode"] == "update":
-            if request.data["status"]:
-                star = ExecutionStar()
-                user = Profile.objects.get(Q(id=request.data['user_id']))
-                execution = Execution.objects.get(Q(id=request.data['execution_id']))
-                star.user = user
-                star.execution = execution
-                star.star_time = datetime.timedelta(days=30)
-                star.save()
-                return Response(1)
-            else:
-                star = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
-                star.delete()
-            return Response(0)
 
-
-#
 # @api_view(['POST'])
 # def loadExecution(request):
 #     executions = Execution.objects.filter(Q(homework=request.data['homeworkId']))
@@ -320,32 +343,6 @@ def getUnfinishHomework(request, user_id):
         homeworks.append(serializer.data)
     return Response(homeworks)
 
-
-
-@api_view(['GET'])
-def getUserStarExecutions(request, user_id):
-    stars = ExecutionStar.objects.filter(Q(user=user_id))
-    executions = []
-    for star in stars:
-        execution = Execution.objects.get(Q(id=star.execution.id))
-        user = Profile.objects.get(Q(id=execution.user.id))
-        content_images = []
-        media_type = MediaType.objects.get(Q(name="Photo"))
-        medias = Media.objects.filter(
-            Q(execution=execution.id) & Q(type=media_type))
-        for media in medias:
-            content_images.append(media.get_media())
-        n_execution = {
-                        'id': execution.id,
-                       'user_name': user.name,
-                       'user_image': user.get_image(),
-                       'user_id': user.id,
-                       'finish_time': execution.finish_time,
-                       'content_text': execution.content_text,
-                       'content_images': content_images
-                       }
-        executions.append(n_execution)
-    return Response(executions)
 
 
 @api_view(['POST'])

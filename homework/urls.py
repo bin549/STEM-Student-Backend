@@ -17,7 +17,6 @@ urlpatterns = [
     path('getExcellentExecutionUserNames/<str:homework_id>/', views.getExcellentExecutionUserNames),
     path('getExecutionsById/<str:homework_id>/', views.getExecutionsById),
     path('getExecutionExcellentById/<str:execution_id>/', views.getExecutionExcellentById),
-    path('getUserStarExecutions/<str:user_id>/', views.getUserStarExecutions),
     path('removeStar/', views.removeStar),
     path('getCourseId/<str:homework_id>/', views.getCourseId),
     path('getExecutionById/<str:execution_id>/', views.getExecutionById),
@@ -29,5 +28,6 @@ urlpatterns = [
     path('getExecution/', views.ExecutionAPI.as_view()),
     path('getExecutionImages/<str:execution_id>/', views.MediaAPI.as_view()),
     path('getStar/', views.StarAPI.as_view()),
+    path('getStar/<str:user_id>/', views.StarAPI.as_view()),
     path('setStar/', views.StarAPI.as_view()),
 ]

@@ -131,6 +131,40 @@ class SelectionAPI(APIView):
             return Response(0)
 
 
+class CommentAPI(APIView):
+
+    def get(self, request, lecture_id, format=None):
+        comments = Comment.objects.filter(Q(lecture=lecture_id))
+        serializer = CommentSerializer(comments, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        if "mode" in request.data:
+            if request.data["mode"] == "create":
+                user = Profile.objects.get(Q(id=request.data['user_id']))
+                lecture = Lecture.objects.get(Q(id=request.data['lecture_id']))
+                comment = Comment()
+                comment.user = user
+                comment.lecture = lecture
+                comment.content = request.data['content']
+                comment.comment_time = datetime.timedelta(days=30)
+                comment.save()
+                return Response('createCourse!')
+            if request.data["mode"] == "delete":
+                comment = Comment.objects.get(Q(id=request.data["comment_id"]))
+                comment.delete()
+                return Response(1)
+        if "user_id" in request.data:
+            comments = Comment.objects.filter(Q(user=request.data["user_id"]))
+            n_comments = []
+            for comment in comments:
+                lecture = Lecture.objects.get(Q(id=comment.lecture.id))
+                n_comment = {'id': comment.id, 'lecture': lecture.title, 'content': comment.content,
+                             'comment_time': comment.comment_time}
+                n_comments.append(n_comment)
+            return Response(n_comments)
+
+
 
 class WishlistAPI(APIView):
 
@@ -264,13 +298,6 @@ class CourseDetail(APIView):
         return Response(serializer.data)
 
 
-@api_view(['GET'])
-def getLectureComments(request, lecture_id):
-    comments = Comment.objects.filter(Q(lecture=lecture_id))
-    serializer = CommentSerializer(comments, many=True)
-    return Response(serializer.data)
-
-
 @api_view(['POST'])
 def registerCourse(request):
     try:
@@ -350,44 +377,3 @@ def loadCurrentSelectCourseTitle(request, course_id):
     course = Entity.objects.get(Q(id=course_id))
     serializer = CourseSerializer(course, many=False)
     return Response(serializer.data)
-
-
-@api_view(['POST'])
-def createLectureComment(request):
-    user = Profile.objects.get(Q(id=request.data['userId']))
-    lecture = Lecture.objects.get(Q(id=request.data['lectureId']))
-    future_comment = Comment()
-    future_comment.user = user
-    future_comment.lecture = lecture
-    future_comment.content = request.data['content']
-    future_comment.comment_time = datetime.timedelta(days=30)
-    future_comment.save()
-    return Response('createCourse!')
-
-
-@api_view(['GET'])
-def getOwnerByCourseName(request, course_name):
-    course = Entity.objects.get(Q(title=course_name))
-    owner = Profile.objects.get(Q(id=course.owner.id))
-    serializer = UserSerializer(owner, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def getLectureCommentsByUserId(request, user_id):
-    comments = Comment.objects.filter(Q(user=user_id))
-    n_comments = []
-    for comment in comments:
-        lecture = Lecture.objects.get(Q(id=comment.lecture.id))
-        n_comment = {'id': comment.id, 'lecture': lecture.title, 'content': comment.content,
-                     'comment_time': comment.comment_time}
-        n_comments.append(n_comment)
-    return Response(n_comments)
-
-
-
-@api_view(['GET'])
-def deleteCommentById(request, comment_id):
-    comment = Comment.objects.get(Q(id=comment_id))
-    comment.delete()
-    return Response(1)

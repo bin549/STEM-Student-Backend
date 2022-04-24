@@ -15,11 +15,7 @@ urlpatterns = [
     path('getCourseGenre/<str:genre_id>/', views.getCourseGenre),
     path('getLectureFormat/<str:format_id>/', views.getLectureFormat),
     path('loadCurrentSelectCourseTitle/<str:course_id>/', views.loadCurrentSelectCourseTitle),
-    path('createLectureComment/', views.createLectureComment),
-    path('getLectureComments/<str:lecture_id>/', views.getLectureComments),
-    path('getOwnerByCourseName/<str:course_name>/', views.getOwnerByCourseName),
-    path('getLectureCommentsByUserId/<str:user_id>/', views.getLectureCommentsByUserId),
-    path('deleteCommentById/<str:comment_id>/', views.deleteCommentById),
+
     path('getCourses/', views.CourseAPI.as_view()),
     path('getCourse/<str:course_name>/', views.CourseAPI.as_view()),
     path('getRecomendedCourse/', views.CourseAPI.as_view()),
@@ -32,4 +28,8 @@ urlpatterns = [
     path('createWishlist/', views.WishlistAPI.as_view()),
     path('deleteWishlist/', views.WishlistAPI.as_view()),
     path('getWishlist/', views.WishlistAPI.as_view()),
+    path('getComments/<str:lecture_id>/', views.CommentAPI.as_view()),
+    path('getCommentsByUserId/', views.CommentAPI.as_view()),
+    path('createComment/', views.CommentAPI.as_view()),
+    path('deleteComment/', views.CommentAPI.as_view()),
 ]

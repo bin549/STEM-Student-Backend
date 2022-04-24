@@ -5,28 +5,59 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import Profile, Type, Message, Follow, Note
+from course.models import Entity
 from .serializers import UserSerializer, TypeSerializer, MessageSerializer, NoteSerializer
 
 
 
 class ProfileAPI(APIView):
 
-    def get(self, request, user_id,format=None):
+    def get(self, request, user_id, format=None):
         profile = Profile.objects.get(id=user_id)
         serializer = UserSerializer(profile, many=False)
         return Response(serializer.data)
 
+    def post(self, request, format=None):
+        print(request.data)
+        if request.data["mode"] == "owner":
+            course = Entity.objects.get(Q(title=request.data["course_name"]))
+            owner = Profile.objects.get(Q(id=course.owner.id))
+            serializer = UserSerializer(owner, many=False)
+            return Response(serializer.data)
 
 
 class FollowAPI(APIView):
 
     def post(self, request, format=None):
-        try:
-            follow = Follow.objects.get(Q(user=request.data['user_id']) & Q(other_user=request.data['other_user_id']))
-            return Response(1)
-        except Exception:
-            return Response(0)
-
+        if "other_user_id" in request.data:
+            try:
+                follow = Follow.objects.get(Q(user=request.data['user_id']) & Q(other_user=request.data['other_user_id']))
+                return Response(1)
+            except Exception:
+                return Response(0)
+        else:
+            if request.data["mode"] == "follower":
+                follows = Follow.objects.filter(other_user=request.data["user_id"])
+                followers = []
+                for follow in follows:
+                    follower = Profile.objects.get(Q(id=follow.user.id))
+                    followers.append(
+                        {
+                            "id": follower.id
+                        }
+                    )
+                return Response(followers)
+            elif request.data["mode"] == "following":
+                follows = Follow.objects.filter(user=request.data["user_id"])
+                followers = []
+                for follow in follows:
+                    follower = Profile.objects.get(Q(id=follow.other_user.id))
+                    followers.append(
+                        {
+                            "id": follower.id
+                        }
+                    )
+                return Response(followers)
 
 
 class NoteAPI(APIView):
@@ -37,10 +68,18 @@ class NoteAPI(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        note = Note.objects.get(id=request.data["note_id"])
-        serializer = NoteSerializer(note, many=False)
-        return Response(serializer.data)
-
+        if "note_id" in request.data:
+            note = Note.objects.get(id=request.data["note_id"])
+            serializer = NoteSerializer(note, many=False)
+            return Response(serializer.data)
+        else:
+            note = Note()
+            note.user = Profile.objects.get(id=request.data['user_id'])
+            note.title = request.data['title']
+            note.content = request.data['content']
+            note.note_time = datetime.timedelta(days=30)
+            note.save()
+            return Response(note.id)
 
 
 @api_view(['GET'])
@@ -180,46 +219,7 @@ def removeFollow(request):
 
 
 @api_view(['GET'])
-def getFollowersId(request, user_id):
-    follows = Follow.objects.filter(other_user=user_id)
-    followers = []
-    for follow in follows:
-        follower = Profile.objects.get(Q(id=follow.user.id))
-        followers.append(
-            {
-                "id": follower.id
-            }
-        )
-    return Response(followers)
-
-
-@api_view(['GET'])
-def getFollowingsId(request, user_id):
-    follows = Follow.objects.filter(user=user_id)
-    followers = []
-    for follow in follows:
-        follower = Profile.objects.get(Q(id=follow.other_user.id))
-        followers.append(
-            {
-                "id": follower.id
-            }
-        )
-    return Response(followers)
-
-
-@api_view(['GET'])
 def getUserTypeById(request, user_type_id):
     type = Type.objects.get(id=user_type_id)
     serializer = TypeSerializer(type, many=False)
     return Response(serializer.data)
-
-
-@api_view(['POST'])
-def createNote(request):
-    note = Note()
-    note.user = Profile.objects.get(id=request.data['user_id'])
-    note.title = request.data['title']
-    note.content = request.data['content']
-    note.note_time = datetime.timedelta(days=30)
-    note.save()
-    return Response(note.id)
