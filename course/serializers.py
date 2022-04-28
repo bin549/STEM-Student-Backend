@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Entity, Genre, Selection, Wishlist, Lecture, Format, Comment
+from .models import Entity, Genre, Selection, Wishlist, Lecture, Format, Comment, History, Progress
 
 
 class CourseSerializer(serializers.ModelSerializer):
@@ -18,6 +18,7 @@ class CourseSerializer(serializers.ModelSerializer):
             "get_absolute_url",
             "get_image",
             "get_student_url",
+            "price",
             "serial_number",
         )
 
@@ -65,10 +66,13 @@ class LectureSerializer(serializers.ModelSerializer):
             "index",
             "title",
             "created_time",
+            "cover_img",
             "media",
             "format",
             "course",
             "is_preview",
+            "is_free",
+            "is_comment_check",
             "get_absolute_url",
             "get_media"
         )
@@ -94,4 +98,28 @@ class CommentSerializer(serializers.ModelSerializer):
             "lecture",
             "content",
             "comment_time",
+        )
+
+
+class HistorySerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = History
+        fields = (
+            "id",
+            "user",
+            "lecture",
+            "learn_time",
+        )
+
+
+class ProgressSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Progress
+        fields = (
+            "id",
+            "user",
+            "lecture",
+            "percent",
         )

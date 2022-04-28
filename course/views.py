@@ -10,8 +10,8 @@ from rest_framework import status
 from homework.models import Assignment, Execution
 from users.models import Profile
 from users.serializers import UserSerializer
-from .models import Entity, Genre, Selection, Wishlist, Lecture, Format, Comment
-from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, WishlistSerializer, LectureSerializer, FormatSerializer, CommentSerializer
+from .models import Entity, Genre, Selection, Wishlist, Lecture, Format, Comment, History
+from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, WishlistSerializer, LectureSerializer, FormatSerializer, CommentSerializer, HistorySerializer
 from .utils import paginateCourses
 
 
@@ -172,6 +172,9 @@ class CommentAPI(APIView):
             if request.data["mode"] == "create":
                 user = Profile.objects.get(Q(id=request.data['user_id']))
                 lecture = Lecture.objects.get(Q(id=request.data['lecture_id']))
+                if lecture.is_comment_check:
+                    lecture.is_comment_check = False
+                    lecture.save()
                 comment = Comment()
                 comment.user = user
                 comment.lecture = lecture
@@ -234,22 +237,6 @@ class AllVisibleCourse(APIView):
     def get(self, request, format=None):
         courses = Entity.objects.filter(Q(is_visible=True))
         serializer = CourseSerializer(courses, many=True)
-        return Response(serializer.data)
-
-
-class AllSelection(APIView):
-
-    def get(self, request, format=None):
-        selections = Selection.objects.all()[0:4]
-        serializer = SelectionSerializer(selections, many=True)
-        return Response(serializer.data)
-
-
-class AllCollection(APIView):
-
-    def get(self, request, format=None):
-        collections = Wishlist.objects.all()[0:4]
-        serializer = WishlistSerializer(collections, many=True)
         return Response(serializer.data)
 
 
@@ -326,6 +313,30 @@ class CourseDetail(APIView):
         serializer = CourseSerializer(course)
         return Response(serializer.data)
 
+
+
+
+class HistoryAPI(APIView):
+
+    def get(self, request, user_id, format=None):
+        historys = History.objects.filter(user=user_id)
+        serializer = HistorySerializer(historys, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        history = History()
+        user = Profile.objects.get(Q(id=request.data["user_id"]))
+        lecture = Lecture.objects.get(Q(id=request.data["lecture_id"]))
+        history.user = user
+        history.lecture = lecture
+        history.learn_time = datetime.timedelta(days=30)
+        history.save()
+        return Response(1)
+
+    def delete(self, request, history_id, format=None):
+        history = History.objects.get(Q(id=history_id))
+        history.delete()
+        return Response(1)
 
 
 @api_view(['POST'])

@@ -3,7 +3,6 @@ from homework import views
 
 
 urlpatterns = [
-    path('deleteHomework/', views.deleteHomework),
     path('getAllHomework/', views.AllHomework.as_view()),
     path('getUnfinishHomework/<str:user_id>/', views.getUnfinishHomework),
     path('uploadHomework/', views.uploadHomework),
@@ -30,4 +29,5 @@ urlpatterns = [
     path('getStar/', views.StarAPI.as_view()),
     path('getStar/<str:user_id>/', views.StarAPI.as_view()),
     path('setStar/', views.StarAPI.as_view()),
+    path('createActivityLog/<str:execution_id>/', views.LogAPI.as_view()),
 ]

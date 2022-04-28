@@ -4,13 +4,11 @@ from course import views
 
 urlpatterns = [
     path('getAllVisibleCourse/', views.AllVisibleCourse.as_view()),
-    path('getAllCollection/', views.AllCollection.as_view()),
     path('courses/<slug:genre_slug>/', views.GenreDetail.as_view()),
-    path('getAllSelection/', views.AllSelection.as_view()),
     path('getUserWishlist/<str:user_id>/', views.getUserWishlist),
     path('getCourseVisibleStatus/', views.getCourseVisibleStatus),
     path('addCourseStudent/', views.addCourseStudent),
-    path('getCourseOwner/<str:course_id>/', views.getCourseOwner),
+    path('getCourseOwner/', views.getCourseOwner),
     path('getCourseGenre/<str:genre_id>/', views.getCourseGenre),
     path('getLectureFormat/<str:format_id>/', views.getLectureFormat),
     path('loadCurrentSelectCourseTitle/<str:course_id>/', views.loadCurrentSelectCourseTitle),
@@ -32,4 +30,7 @@ urlpatterns = [
     path('getCommentsByUserId/', views.CommentAPI.as_view()),
     path('createComment/', views.CommentAPI.as_view()),
     path('deleteComment/', views.CommentAPI.as_view()),
+    path('createHistory/', views.HistoryAPI.as_view()),
+    path('getHistories/<str:user_id>/', views.HistoryAPI.as_view()),
+    path('deleteHistory/<str:history_id>/', views.HistoryAPI.as_view()),
 ]

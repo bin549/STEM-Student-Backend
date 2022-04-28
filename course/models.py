@@ -23,6 +23,7 @@ class Entity(models.Model):
     owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
     genre = models.ForeignKey(Genre, null=True, blank=True, on_delete=models.CASCADE)
     is_visible = models.BooleanField(default=False, null=True)
+    price = models.IntegerField()
     serial_number = models.IntegerField()
 
     class Meta:
@@ -80,9 +81,12 @@ class Lecture(models.Model):
     index = models.IntegerField(default=1)
     title = models.CharField(max_length=200)
     created_time = models.DateTimeField(auto_now_add=True)
+    cover_img = models.ImageField(null=True, blank=True, upload_to='profiles/', default="profiles/user-default.png")
     media = models.ImageField(null=True, blank=True, upload_to='profiles/', default="profiles/about-us-video.mp4")
     format = models.ForeignKey(Format, null=True, blank=True, on_delete=models.CASCADE)
     is_preview = models.BooleanField(default=False, null=True)
+    is_free = models.IntegerField(null=True)
+    is_comment_check = models.BooleanField(default=False, null=True)
     course = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -122,3 +126,25 @@ class Evaluation(models.Model):
 
     def __str__(self):
         return '%s' % self.id
+
+
+class History(models.Model):
+
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
+    lecture = models.ForeignKey(Lecture, null=True, blank=True, on_delete=models.CASCADE)
+    learn_time = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return '%s' % self.id
+
+
+class Progress(models.Model):
+
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    user = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.CASCADE)
+    lecture = models.ForeignKey(Lecture, null=True, blank=True, on_delete=models.CASCADE)
+    percent = models.FloatField()
+
+    def __str__(self):
+        return '%s' % self.percent

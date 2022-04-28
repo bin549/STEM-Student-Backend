@@ -8,7 +8,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from course.models import Entity, Selection
 from users.models import Profile
-from .models import Assignment, Execution, MediaType, Media, ExecutionStar
+from .models import Assignment, Execution, MediaType, Media, ExecutionStar, Log, LogType
 
 
 class AssignmentAPI(APIView):
@@ -27,20 +27,19 @@ class AssignmentAPI(APIView):
             homework = Assignment.objects.get(Q(id=request.data["homework_id"]))
             serializer = HomeworkSerializer(homework, many=False)
             return Response(serializer.data)
-        if "course_id" in request.data:
-            executions = Execution.objects.filter(Q(user=request.data['uesr_id']))
+        elif "course_id" in request.data:
+            executions = Execution.objects.filter(Q(user=request.data['user_id']))
             userHomeworks = []
             for execution in executions:
                 try:
-                    homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+                    homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['course_id']))
                     userHomework = {'id': homework.id, 'description': homework.description[0:50]+"...",  'intro': homework.intro, 'start_time': homework.start_time,
-                                    'end_time': homework.end_time, 'score': execution.score,
-                                    'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
+                                    'end_time': homework.end_time, 'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
                     userHomeworks.append(userHomework)
                 except Exception:
                     pass
             return Response(userHomeworks)
-        if "is_finish" in request.data:
+        elif "is_finish" in request.data:
             if request.data["is_finish"]:
                 executions = Execution.objects.filter(Q(user=request.data['user_id']))
                 executions = executions.exclude(Q(finish_time=None))
@@ -59,7 +58,6 @@ class AssignmentAPI(APIView):
                 except Exception:
                     pass
             return Response(userHomeworks)
-
 
 
 
@@ -167,17 +165,18 @@ class ExecutionAPI(APIView):
         else:
             return Response(1)
 
-@api_view(['POST'])
-def deleteHomework(request):
-    try:
-        homework = Assignment.objects.get(Q(id=request.data['homeworkId']))
-        homework.delete()
-        executions = Execution.objects.filter(Q(homework=request.data['homeworkId']))
-        for execution in executions:
-            execution.delete()
+
+class LogAPI(APIView):
+
+    def post(self, request, execution_id, format=None):
+        log = Log()
+        execution = Execution.objects.get(Q(id=execution_id))
+        log_type = LogType.objects.get(Q(name="提交"))
+        log.execution = execution
+        log.log_type = log_type
+        log.log_time = datetime.timedelta(days=30)
+        log.save()
         return Response(1)
-    except Exception:
-        return Response(0)
 
 
 class AllHomework(APIView):
