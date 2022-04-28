@@ -71,7 +71,6 @@ class LectureSerializer(serializers.ModelSerializer):
             "format",
             "course",
             "is_preview",
-            "is_free",
             "is_comment_check",
             "get_absolute_url",
             "get_media"

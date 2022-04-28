@@ -18,6 +18,7 @@ urlpatterns = [
     path('getRecomendedCourse/', views.CourseAPI.as_view()),
     path('getCoursesCount/', views.CourseAPI.as_view()),
     path('getGenres/', views.GenreAPI.as_view()),
+    path('getCourseProgress/', views.CourseAPI.as_view()),
     path('getPreviewLecture/', views.LectureAPI.as_view()),
     path('getLectures/<str:course_id>/', views.LectureAPI.as_view()),
     path('getLectureById/', views.LectureAPI.as_view()),
@@ -33,4 +34,6 @@ urlpatterns = [
     path('createHistory/', views.HistoryAPI.as_view()),
     path('getHistories/<str:user_id>/', views.HistoryAPI.as_view()),
     path('deleteHistory/<str:history_id>/', views.HistoryAPI.as_view()),
+    path('getFormats/', views.FormatAPI.as_view()),
+    path('updateProgress/', views.ProgressAPI.as_view()),
 ]

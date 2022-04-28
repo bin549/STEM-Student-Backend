@@ -85,7 +85,6 @@ class Lecture(models.Model):
     media = models.ImageField(null=True, blank=True, upload_to='profiles/', default="profiles/about-us-video.mp4")
     format = models.ForeignKey(Format, null=True, blank=True, on_delete=models.CASCADE)
     is_preview = models.BooleanField(default=False, null=True)
-    is_free = models.IntegerField(null=True)
     is_comment_check = models.BooleanField(default=False, null=True)
     course = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
 

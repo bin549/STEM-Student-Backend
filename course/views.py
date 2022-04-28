@@ -10,7 +10,7 @@ from rest_framework import status
 from homework.models import Assignment, Execution
 from users.models import Profile
 from users.serializers import UserSerializer
-from .models import Entity, Genre, Selection, Wishlist, Lecture, Format, Comment, History
+from .models import Entity, Genre, Selection, Wishlist, Lecture, Format, Comment, History, Progress
 from .serializers import CourseSerializer, GenreSerializer, SelectionSerializer, WishlistSerializer, LectureSerializer, FormatSerializer, CommentSerializer, HistorySerializer
 from .utils import paginateCourses
 
@@ -56,6 +56,10 @@ class CourseAPI(APIView):
                 except Exception:
                     courses = Entity.objects.filter(Q(is_visible=True))
                     return Response(len(courses))
+        elif request.data["mode"] == "progress":
+            all_lectures = Selection.objects.filter(Q(course=request.data["course_id"]))
+            checked_lectures = Progress.objects.filter(Q(user=request.data["user_id"]) & Q(percent=1.0))
+            return Response(float(len(checked_lectures)) / (len(all_lectures)))
         elif request.data["mode"] == "condition":
             try:
                 genre = Genre.objects.get(Q(name=request.data['genre']))
@@ -96,22 +100,14 @@ class CourseAPI(APIView):
 class LectureAPI(APIView):
 
     def get(self, request, course_id, format=None):
-        lectures = Lecture.objects.filter(Q(course=course_id))
-        n_lectures = []
-        for lecture in lectures:
-            format = Format.objects.get(Q(id=lecture.format.id))
-            n_lecture = {
-                "id": lecture.id,
-                "title": lecture.title,
-                "format_name": format.name
-            }
-            n_lectures.append(n_lecture)
-        return Response(n_lectures)
+        lectures = Lecture.objects.filter(Q(course=course_id)).order_by("index")
+        serializer = LectureSerializer(lectures, many=True)
+        return Response(serializer.data)
 
     def post(self, request, format=None):
         if "mode" in request.data:
             if request.data["mode"] == "preview":
-                lectures = Lecture.objects.filter(Q(course=request.data["course_id"]))
+                lectures = Lecture.objects.filter(Q(course=request.data["course_id"])).order_by("index")
                 lecture = lectures.get(Q(is_preview=True))
                 serializer = LectureSerializer(lecture, many=False)
                 return Response(serializer.data)
@@ -119,6 +115,14 @@ class LectureAPI(APIView):
             lecture = Lecture.objects.get(Q(id=request.data["lecture_id"]))
             serializer = LectureSerializer(lecture, many=False)
             return Response(serializer.data)
+
+
+class FormatAPI(APIView):
+
+    def get(self, request, format=None):
+        formats = Format.objects.all()
+        serializer = FormatSerializer(formats, many=True)
+        return Response(serializer.data)
 
 
 class SelectionAPI(APIView):
@@ -140,17 +144,24 @@ class SelectionAPI(APIView):
                     wishlist.delete()
                 except Exception:
                     print('wishlist was deleted!')
-                new_selection = Selection()
-                new_selection.user = user
-                new_selection.course = course
-                new_selection.select_time = datetime.timedelta(days=30)
-                new_selection.save()
+                selection = Selection()
+                selection.user = user
+                selection.course = course
+                selection.select_time = datetime.timedelta(days=30)
+                selection.save()
                 homeworks = Assignment.objects.filter(Q(course=course.id))
                 for homework in homeworks:
                     execution = Execution()
                     execution.homework = homework
                     execution.user = user
                     execution.save()
+                lectures = Lecture.objects.filter(course=course.id)
+                for lecture in lectures:
+                    progress = Progress()
+                    progress.user = user
+                    progress.lecture = lecture
+                    progress.percent = 0.0
+                    progress.save()
             return Response('Register Success.')
         else:
             try:
@@ -230,6 +241,19 @@ class GenreAPI(APIView):
         genres = Genre.objects.all()[0:4]
         serializer = GenreSerializer(genres, many=True)
         return Response(serializer.data)
+
+
+class ProgressAPI(APIView):
+
+    def put(self, request, format=None):
+        progress = Progress.objects.get(Q(user=request.data["user_id"]) & Q(lecture=request.data["lecture_id"]))
+        progress.percent = 1.0
+        progress.save()
+        # genres = Genre.objects.all()[0:4]
+        # serializer = GenreSerializer(genres, many=True)
+        return Response(1)
+
+
 
 
 class AllVisibleCourse(APIView):
