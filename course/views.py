@@ -57,9 +57,11 @@ class CourseAPI(APIView):
                     courses = Entity.objects.filter(Q(is_visible=True))
                     return Response(len(courses))
         elif request.data["mode"] == "progress":
-            all_lectures = Selection.objects.filter(Q(course=request.data["course_id"]))
+            selection = Selection.objects.get(Q(course=request.data["course_id"]) & Q(user=request.data["user_id"]))
+            all_lectures = Lecture.objects.filter(Q(course=selection.course.id))
             checked_lectures = Progress.objects.filter(Q(user=request.data["user_id"]) & Q(percent=1.0))
-            return Response(float(len(checked_lectures)) / (len(all_lectures)))
+            left_lectures = checked_lectures.filter(Q(lecture__in=all_lectures))
+            return Response(float(len(left_lectures)) / (len(all_lectures)))
         elif request.data["mode"] == "condition":
             try:
                 genre = Genre.objects.get(Q(name=request.data['genre']))
@@ -343,9 +345,19 @@ class CourseDetail(APIView):
 class HistoryAPI(APIView):
 
     def get(self, request, user_id, format=None):
-        historys = History.objects.filter(user=user_id)
-        serializer = HistorySerializer(historys, many=True)
-        return Response(serializer.data)
+        histories = History.objects.filter(user=user_id)
+        datas = []
+        for history in histories:
+            print(history.learn_time)
+            lecture = Lecture.objects.get(Q(id=history.lecture.id))
+            course = Entity.objects.get(Q(id=lecture.course.id))
+            data = {
+                "lecture": lecture.title,
+                "course": course.title,
+                "learn_time": history.learn_time,
+            }
+            datas.append(data)
+        return Response(datas)
 
     def post(self, request, format=None):
         history = History()
