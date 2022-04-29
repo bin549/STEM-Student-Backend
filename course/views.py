@@ -245,9 +245,19 @@ class GenreAPI(APIView):
         return Response(serializer.data)
 
 
+
 class ProgressAPI(APIView):
 
-    def put(self, request, format=None):
+    def post(self, request, format=None):
+        course = Entity.objects.get(Q(id=request.data["course_id"]))
+        lectures = Lecture.objects.filter(Q(course=course.id))
+        data = {}
+        for lecture in lectures:
+            progress = Progress.objects.get(Q(lecture=lecture.id) & Q(user=request.data["user_id"]))
+            data[str(lecture.id)] = progress.percent==1.0
+        return Response(data)
+
+    def put(self, request, forsmat=None):
         progress = Progress.objects.get(Q(user=request.data["user_id"]) & Q(lecture=request.data["lecture_id"]))
         progress.percent = 1.0
         progress.save()

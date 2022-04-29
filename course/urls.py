@@ -36,4 +36,5 @@ urlpatterns = [
     path('deleteHistory/<str:history_id>/', views.HistoryAPI.as_view()),
     path('getFormats/', views.FormatAPI.as_view()),
     path('updateProgress/', views.ProgressAPI.as_view()),
+    path('getLecturesStatus/', views.ProgressAPI.as_view()),
 ]
