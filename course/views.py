@@ -43,8 +43,7 @@ class CourseAPI(APIView):
                     course_ids.add(e.course.id)
                 try:
                     genre = Genre.objects.get(Q(name=request.data['genre']))
-                    courses = Entity.objects.filter(
-                        Q(genre=genre.id) & Q(id__in=course_ids))
+                    courses = Entity.objects.filter(Q(genre=genre.id) & Q(id__in=course_ids))
                 except Exception:
                     courses = Entity.objects.filter(Q(id__in=course_ids))
                 return Response(len(courses))
@@ -211,7 +210,27 @@ class CommentAPI(APIView):
 
 
 
+@api_view(['GET'])
+def getUserWishlist(request, user_id):
+    collections = Wishlist.objects.filter(Q(user=user_id))
+    courses = []
+    for c in collections:
+        course = Entity.objects.get(Q(id=c.course.id))
+        courses.append(course)
+    serializer = CourseSerializer(courses, many=True)
+    return Response(serializer.data)
+
+
+
 class WishlistAPI(APIView):
+
+    def get(self, request, user_id, format=None):
+        wishlists = Wishlist.objects.filter(Q(user=user_id))
+        courses = []
+        for wishlist in wishlists:
+            courses.append(wishlist.course)
+            serializer = CourseSerializer(courses, many=True)
+        return Response(serializer.data)
 
     def post(self, request, format=None):
         if request.data["mode"] == "fetch":
@@ -240,10 +259,17 @@ class WishlistAPI(APIView):
 class GenreAPI(APIView):
 
     def get(self, request, format=None):
-        genres = Genre.objects.all()[0:4]
+        genres = Genre.objects.all()
         serializer = GenreSerializer(genres, many=True)
         return Response(serializer.data)
 
+
+
+@api_view(['GET'])
+def getCourseGenre(request, genre_id):
+    genre = Genre.objects.get(Q(id=genre_id))
+    serializer = GenreSerializer(genre, many=False)
+    return Response(serializer.data)
 
 
 class ProgressAPI(APIView):
@@ -310,31 +336,11 @@ def getCourseOwner(request, course_id):
     serializer = UserSerializer(owner, many=False)
     return Response(serializer.data)
 
-
-@api_view(['GET'])
-def getUserWishlist(request, user_id):
-    collections = Wishlist.objects.filter(Q(user=user_id))
-    courses = []
-    for c in collections:
-        course = Entity.objects.get(Q(id=c.course.id))
-        courses.append(course)
-    serializer = CourseSerializer(courses, many=True)
-    return Response(serializer.data)
-
-
 @api_view(['GET'])
 def getCourse(request, course_id):
     courses = Entity.objects.get(Q(id=course_id))
     serializer = CourseSerializer(courses, many=False)
     return Response(serializer.data)
-
-
-@api_view(['GET'])
-def getCourseGenre(request, genre_id):
-    genre = Genre.objects.get(Q(id=genre_id))
-    serializer = GenreSerializer(genre, many=False)
-    return Response(serializer.data)
-
 
 class CourseDetail(APIView):
 
@@ -355,7 +361,7 @@ class CourseDetail(APIView):
 class HistoryAPI(APIView):
 
     def get(self, request, user_id, format=None):
-        histories = History.objects.filter(user=user_id)
+        histories = History.objects.filter(user=user_id).order_by("-learn_time")[0:50]
         datas = []
         for history in histories:
             print(history.learn_time)
@@ -394,31 +400,6 @@ def getCourseVisibleStatus(request):
         return Response(0)
     except Exception:
         return Response(0)
-
-
-@api_view(['POST'])
-def addCourseStudent(request):
-    try:
-        course = Entity.objects.get(Q(id=request.data['courseId']))
-        user = Profile.objects.get(Q(id=request.data['userId']))
-    except Exception:
-        return Response('user Not Existed', status=status.HTTP_201_CREATED)
-    try:
-        Selection.objects.get(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
-        return Response('Selection Existed', status=status.HTTP_201_CREATED)
-    except Exception:
-        selection = Selection()
-        selection.user = user
-        selection.course = course
-        selection.select_time = datetime.timedelta(days=30)
-        selection.save()
-        homeworks = Assignment.objects.filter(Q(course=course.id))
-        for homework in homeworks:
-            execution = Execution()
-            execution.homework = homework
-            execution.user = user
-            execution.save()
-        return Response(1)
 
 @api_view(['GET'])
 def getLectureFormat(request, format_id):
