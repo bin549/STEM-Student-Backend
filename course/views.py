@@ -60,7 +60,9 @@ class CourseAPI(APIView):
             all_lectures = Lecture.objects.filter(Q(course=selection.course.id))
             checked_lectures = Progress.objects.filter(Q(user=request.data["user_id"]) & Q(percent=1.0))
             left_lectures = checked_lectures.filter(Q(lecture__in=all_lectures))
-            return Response(float(len(left_lectures)) / (len(all_lectures)))
+            progress = round(float(len(left_lectures)) / (len(all_lectures)), 2)
+            print(progress)
+            return Response(progress)
         elif request.data["mode"] == "condition":
             try:
                 genre = Genre.objects.get(Q(name=request.data['genre']))
@@ -95,7 +97,6 @@ class CourseAPI(APIView):
                 courses.append(course)
             serializer = CourseSerializer(courses, many=True)
             return Response(serializer.data)
-
 
 
 class LectureAPI(APIView):

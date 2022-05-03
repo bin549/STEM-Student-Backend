@@ -68,18 +68,23 @@ class NoteAPI(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        if "note_id" in request.data:
+        if "mode" in request.data:
             note = Note.objects.get(id=request.data["note_id"])
-            serializer = NoteSerializer(note, many=False)
-            return Response(serializer.data)
+            note.delete()
+            return Response(1)
         else:
-            note = Note()
-            note.user = Profile.objects.get(id=request.data['user_id'])
-            note.title = request.data['title']
-            note.content = request.data['content']
-            note.note_time = datetime.timedelta(days=30)
-            note.save()
-            return Response(note.id)
+            if "note_id" in request.data:
+                note = Note.objects.get(id=request.data["note_id"])
+                serializer = NoteSerializer(note, many=False)
+                return Response(serializer.data)
+            else:
+                note = Note()
+                note.user = Profile.objects.get(id=request.data['user_id'])
+                note.title = request.data['title']
+                note.content = request.data['content']
+                note.note_time = datetime.timedelta(days=30)
+                note.save()
+                return Response(note.id)
 
 
 class MessageAPI(APIView):

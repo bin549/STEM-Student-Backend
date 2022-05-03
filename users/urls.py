@@ -24,5 +24,6 @@ urlpatterns = [
     path('getNotes/<str:user_id>/', views.NoteAPI.as_view()),
     path('getNoteById/', views.NoteAPI.as_view()),
     path('createNote/', views.NoteAPI.as_view()),
+    path('deleteNote/', views.NoteAPI.as_view()),
     path('createMessage/', views.MessageAPI.as_view()),
 ]
