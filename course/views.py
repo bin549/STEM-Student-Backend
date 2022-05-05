@@ -107,16 +107,9 @@ class LectureAPI(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        if "mode" in request.data:
-            if request.data["mode"] == "preview":
-                lectures = Lecture.objects.filter(Q(course=request.data["course_id"])).order_by("index")
-                lecture = lectures.get(Q(is_preview=True))
-                serializer = LectureSerializer(lecture, many=False)
-                return Response(serializer.data)
-        elif "lecture_id" in request.data:
-            lecture = Lecture.objects.get(Q(id=request.data["lecture_id"]))
-            serializer = LectureSerializer(lecture, many=False)
-            return Response(serializer.data)
+        lecture = Lecture.objects.get(Q(id=request.data["lecture_id"]))
+        serializer = LectureSerializer(lecture, many=False)
+        return Response(serializer.data)
 
 
 class FormatAPI(APIView):
@@ -362,7 +355,7 @@ class CourseDetail(APIView):
 class HistoryAPI(APIView):
 
     def get(self, request, user_id, format=None):
-        histories = History.objects.filter(user=user_id).order_by("-learn_time")[0:50]
+        histories = History.objects.filter(user=user_id).order_by("-learn_time")[0:20]
         datas = []
         for history in histories:
             print(history.learn_time)

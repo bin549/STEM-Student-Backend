@@ -72,3 +72,17 @@ class Note(models.Model):
     title = models.CharField(max_length=200, null=True, blank=True)
     content = models.TextField()
     note_time = models.DateTimeField(auto_now_add=True)
+
+
+class Photo(models.Model):
+
+    id = models.UUIDField(default=uuid.uuid4, unique=True, primary_key=True, editable=False)
+    media = models.ImageField(null=True, blank=True, upload_to='profiles/', default="profiles/user-default.png")
+    upload_time = models.DateTimeField(auto_now_add=True)
+    is_cover = models.BooleanField(default=False, null=True)
+    user = models.OneToOneField(Profile, on_delete=models.CASCADE, unique=False, null=True, blank=True)
+
+    def get_image(self):
+        if self.media:
+            return self.media.url
+        return ''

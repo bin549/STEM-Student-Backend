@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Profile, Type, Message, Note
+from .models import Profile, Type, Message, Note, Photo
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -60,4 +60,17 @@ class NoteSerializer(serializers.ModelSerializer):
             "title",
             "content",
             "note_time",
+        )
+
+class PhotoSerializer(serializers.ModelSerializer):
+
+    class Meta:
+
+        model = Photo
+        fields = (
+            "id",
+            "media",
+            "upload_time",
+            "is_cover",
+            "user",
         )

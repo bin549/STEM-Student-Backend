@@ -26,4 +26,9 @@ urlpatterns = [
     path('createNote/', views.NoteAPI.as_view()),
     path('deleteNote/', views.NoteAPI.as_view()),
     path('createMessage/', views.MessageAPI.as_view()),
+    path('getPhotos/', views.PhotoAPI.as_view()),
+    path('createPhoto/', views.PhotoAPI.as_view()),
+    path('deletePhoto/', views.PhotoAPI.as_view()),
+    path('updatePhotoCover/', views.PhotoAPI.as_view()),
+    path('getPhoto/', views.PhotoAPI.as_view()),
 ]

@@ -23,7 +23,6 @@ urlpatterns = [
     path('getCoursesCount/', views.CourseAPI.as_view()),
     path('getGenres/', views.GenreAPI.as_view()),
     path('getCourseProgress/', views.CourseAPI.as_view()),
-    path('getPreviewLecture/', views.LectureAPI.as_view()),
     path('getLectures/<str:course_id>/', views.LectureAPI.as_view()),
     path('getLectureById/', views.LectureAPI.as_view()),
     path('getSelection/', views.SelectionAPI.as_view()),

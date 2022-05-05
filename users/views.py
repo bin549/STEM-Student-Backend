@@ -4,10 +4,9 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import Profile, Type, Message, Follow, Note
+from .models import Profile, Type, Message, Follow, Note, Photo
 from course.models import Entity
-from .serializers import UserSerializer, TypeSerializer, MessageSerializer, NoteSerializer
-
+from .serializers import UserSerializer, TypeSerializer, MessageSerializer, NoteSerializer, PhotoSerializer
 
 
 class ProfileAPI(APIView):
@@ -24,7 +23,6 @@ class ProfileAPI(APIView):
             owner = Profile.objects.get(Q(id=course.owner.id))
             serializer = UserSerializer(owner, many=False)
             return Response(serializer.data)
-
 
 class FollowAPI(APIView):
 
@@ -103,6 +101,49 @@ class MessageAPI(APIView):
             message.save()
         return Response(1)
 
+
+class PhotoAPI(APIView):
+
+    def get(self, request, format=None):
+        photos = Photo.objects.all().order_by("upload_time")
+        serializer = PhotoSerializer(photos, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        if "mode" in request.data:
+            if request.data["mode"] == "delete":
+                photo = Photo.objects.get(Q(id=request.data["photo_id"]))
+                photo.delete()
+                return Response(1)
+            elif request.data["mode"] == "update":
+                photos = Photo.objects.filter(Q(user=request.data["user_id"]))
+                for photo in photos:
+                    photo.is_cover = False
+                    photo.save()
+                photo = Photo.objects.get(Q(id=request.data["photo_id"]))
+                photo.is_cover = True
+                photo.save()
+                return Response(1)
+            elif request.data["mode"] == "cover":
+                photo = Photo.objects.get(Q(user=request.data["user_id"]) & Q(is_cover=True))
+                serializer = PhotoSerializer(photo, many=False)
+                return Response(serializer.data)
+        else:
+            medias = request.data["medias"]
+            user = Profile.objects.get(Q(id=request.data["user_id"]))
+            for media in medias:
+                photo = Photo()
+                photo.media = media
+                photo.user = user
+                photo.upload_time = datetime.timedelta(days=30)
+                photo.is_cover = False
+                photo.save()
+            return Response(1)
+
+    def delete(self, request, format=None):
+        photo = Photo.objects.get(Q(id=request.data["photo_id"]))
+        print(photo)
+        return Response(1)
 
 @api_view(['GET'])
 def getUserByUserName(request, pk):
