@@ -16,6 +16,8 @@ urlpatterns = [
     path('SetMessageIsReadStatus/<str:message_id>/', views.SetMessageIsReadStatus),
     path('addFollow/', views.addFollow),
     path('removeFollow/', views.removeFollow),
+
+
     path('getProfile/<str:user_id>/', views.ProfileAPI.as_view()),
     path('getOwner/', views.ProfileAPI.as_view()),
     path('getFollow/', views.FollowAPI.as_view()),
@@ -24,6 +26,7 @@ urlpatterns = [
     path('getNotes/<str:user_id>/', views.NoteAPI.as_view()),
     path('getNoteById/', views.NoteAPI.as_view()),
     path('createNote/', views.NoteAPI.as_view()),
+    path('updateNote/', views.NoteAPI.as_view()),
     path('deleteNote/', views.NoteAPI.as_view()),
     path('createMessage/', views.MessageAPI.as_view()),
     path('getPhotos/', views.PhotoAPI.as_view()),

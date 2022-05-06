@@ -128,11 +128,11 @@ class SelectionAPI(APIView):
                 user = Profile.objects.get(Q(id=request.data['user_id']))
                 course = Entity.objects.get(Q(serial_number=request.data['serial_number']))
             except Exception:
-                return Response('Not Existed', status=status.HTTP_201_CREATED)
+                return Response('课程不存在', status=status.HTTP_201_CREATED)
             try:
                 existed_selection = Selection.objects.get(Q(user=user.id) & Q(course=course.id))
                 if existed_selection:
-                    return Response('Register Before', status=status.HTTP_201_CREATED)
+                    return Response('课程正在进行中', status=status.HTTP_201_CREATED)
             except Exception:
                 try:
                     wishlist = Wishlist.objects.get(Q(user=user.id) & Q(course=course.id))

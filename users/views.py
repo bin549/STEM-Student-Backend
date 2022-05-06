@@ -67,9 +67,17 @@ class NoteAPI(APIView):
 
     def post(self, request, format=None):
         if "mode" in request.data:
-            note = Note.objects.get(id=request.data["note_id"])
-            note.delete()
-            return Response(1)
+            if request.data["mode"] == "update":
+                print(request.data["note_id"])
+                note = Note.objects.get(Q(id=request.data["note_id"]))
+                note.title = request.data["title"]
+                note.content = request.data["content"]
+                note.save()
+                return Response(1)
+            else:
+                note = Note.objects.get(Q(id=request.data["note_id"]))
+                note.delete()
+                return Response(1)
         else:
             if "note_id" in request.data:
                 note = Note.objects.get(id=request.data["note_id"])
