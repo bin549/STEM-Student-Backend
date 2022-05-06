@@ -12,6 +12,7 @@ from .serializers import UserSerializer, TypeSerializer, MessageSerializer, Note
 class ProfileAPI(APIView):
 
     def get(self, request, user_id, format=None):
+
         profile = Profile.objects.get(id=user_id)
         serializer = UserSerializer(profile, many=False)
         return Response(serializer.data)
@@ -24,18 +25,13 @@ class ProfileAPI(APIView):
             serializer = UserSerializer(owner, many=False)
             return Response(serializer.data)
 
+
 class FollowAPI(APIView):
 
-    def post(self, request, format=None):
-        if "other_user_id" in request.data:
-            try:
-                follow = Follow.objects.get(Q(user=request.data['user_id']) & Q(other_user=request.data['other_user_id']))
-                return Response(1)
-            except Exception:
-                return Response(0)
-        else:
-            if request.data["mode"] == "follower":
-                follows = Follow.objects.filter(other_user=request.data["user_id"])
+    def get(self, request, format=None):
+        if request.query_params.__contains__("option"):
+            if request.query_params["option"] == "follower":
+                follows = Follow.objects.filter(other_user=request.query_params["user_id"])
                 followers = []
                 for follow in follows:
                     follower = Profile.objects.get(Q(id=follow.user.id))
@@ -45,8 +41,8 @@ class FollowAPI(APIView):
                         }
                     )
                 return Response(followers)
-            elif request.data["mode"] == "following":
-                follows = Follow.objects.filter(user=request.data["user_id"])
+            elif request.query_params["option"] == "following":
+                follows = Follow.objects.filter(user=request.query_params["user_id"])
                 followers = []
                 for follow in follows:
                     follower = Profile.objects.get(Q(id=follow.other_user.id))
@@ -56,42 +52,63 @@ class FollowAPI(APIView):
                         }
                     )
                 return Response(followers)
+        else:
+            try:
+                follow = Follow.objects.get(Q(user=request.query_params['user_id']) & Q(other_user=request.query_params['other_user_id']))
+                return Response(1)
+            except Exception:
+                return Response(0)
+
+    def post(self, request, format=None):
+        follow = Follow()
+        user = Profile.objects.get(Q(id=request.query_params['user_id']))
+        other_user = Profile.objects.get(Q(id=request.query_params['other_user_id']))
+        follow.user = user
+        follow.other_user = other_user
+        follow.follow_time = datetime.timedelta(days=30)
+        follow.save()
+        return Response(1)
+
+    def delete(self, request, format=None):
+        follow = Follow.objects.get(Q(user=request.query_params['user_id']) & Q(other_user=request.query_params['other_user_id']))
+        follow.delete()
+        return Response(1)
 
 
 class NoteAPI(APIView):
 
-    def get(self, request, user_id,format=None):
-        notes = Note.objects.filter(user=user_id)
-        serializer = NoteSerializer(notes, many=True)
-        return Response(serializer.data)
+    def get(self, request, format=None):
+        if request.query_params.__contains__("user_id"):
+            notes = Note.objects.filter(user=request.query_params["user_id"])
+            serializer = NoteSerializer(notes, many=True)
+            return Response(serializer.data)
+        elif request.query_params.__contains__("note_id"):
+            note = Note.objects.get(id=request.query_params["note_id"])
+            serializer = NoteSerializer(note, many=False)
+            return Response(serializer.data)
+
 
     def post(self, request, format=None):
-        if "mode" in request.data:
-            if request.data["mode"] == "update":
-                print(request.data["note_id"])
-                note = Note.objects.get(Q(id=request.data["note_id"]))
-                note.title = request.data["title"]
-                note.content = request.data["content"]
-                note.save()
-                return Response(1)
-            else:
-                note = Note.objects.get(Q(id=request.data["note_id"]))
-                note.delete()
-                return Response(1)
-        else:
-            if "note_id" in request.data:
-                note = Note.objects.get(id=request.data["note_id"])
-                serializer = NoteSerializer(note, many=False)
-                return Response(serializer.data)
-            else:
-                note = Note()
-                note.user = Profile.objects.get(id=request.data['user_id'])
-                note.title = request.data['title']
-                note.content = request.data['content']
-                note.note_time = datetime.timedelta(days=30)
-                note.save()
-                return Response(note.id)
+        note = Note()
+        note.user = Profile.objects.get(id=request.query_params['user_id'])
+        note.title = request.query_params['title']
+        note.content = request.query_params['content']
+        note.note_time = datetime.timedelta(days=30)
+        note.save()
+        return Response(note.id)
 
+    def put(self, request, format=None):
+        print(request.query_params)
+        note = Note.objects.get(Q(id=request.query_params["note_id"]))
+        note.title = request.query_params["title"]
+        note.content = request.query_params["content"]
+        note.save()
+        return Response(1)
+
+    def delete(self, request, format=None):
+        note = Note.objects.get(Q(id=request.query_params["note_id"]))
+        note.delete()
+        return Response(1)
 
 class MessageAPI(APIView):
 
@@ -113,44 +130,40 @@ class MessageAPI(APIView):
 class PhotoAPI(APIView):
 
     def get(self, request, format=None):
-        photos = Photo.objects.all().order_by("upload_time")
-        serializer = PhotoSerializer(photos, many=True)
-        return Response(serializer.data)
+        if request.query_params.__contains__("is_cover"):
+            photo = Photo.objects.get(Q(user=request.query_params["user_id"]) & Q(is_cover=True))
+            serializer = PhotoSerializer(photo, many=False)
+            return Response(serializer.data)
+        else:
+            photos = Photo.objects.filter(Q(user=request.query_params["user_id"])).order_by("upload_time")
+            serializer = PhotoSerializer(photos, many=True)
+            return Response(serializer.data)
 
     def post(self, request, format=None):
-        if "mode" in request.data:
-            if request.data["mode"] == "delete":
-                photo = Photo.objects.get(Q(id=request.data["photo_id"]))
-                photo.delete()
-                return Response(1)
-            elif request.data["mode"] == "update":
-                photos = Photo.objects.filter(Q(user=request.data["user_id"]))
-                for photo in photos:
-                    photo.is_cover = False
-                    photo.save()
-                photo = Photo.objects.get(Q(id=request.data["photo_id"]))
-                photo.is_cover = True
-                photo.save()
-                return Response(1)
-            elif request.data["mode"] == "cover":
-                photo = Photo.objects.get(Q(user=request.data["user_id"]) & Q(is_cover=True))
-                serializer = PhotoSerializer(photo, many=False)
-                return Response(serializer.data)
-        else:
-            medias = request.data["medias"]
-            user = Profile.objects.get(Q(id=request.data["user_id"]))
-            for media in medias:
-                photo = Photo()
-                photo.media = media
-                photo.user = user
-                photo.upload_time = datetime.timedelta(days=30)
-                photo.is_cover = False
-                photo.save()
-            return Response(1)
+        medias = request.data["medias"]
+        user = Profile.objects.get(Q(id=request.data["user_id"]))
+        for media in medias:
+            photo = Photo()
+            photo.media = media
+            photo.user = user
+            photo.upload_time = datetime.timedelta(days=30)
+            photo.is_cover = False
+            photo.save()
+        return Response(1)
+
+    def put(self, request, format=None):
+        photos = Photo.objects.filter(Q(user=request.query_params["user_id"]))
+        for photo in photos:
+            photo.is_cover = False
+            photo.save()
+        photo = Photo.objects.get(Q(id=request.query_params["photo_id"]))
+        photo.is_cover = True
+        photo.save()
+        return Response(1)
 
     def delete(self, request, format=None):
-        photo = Photo.objects.get(Q(id=request.data["photo_id"]))
-        print(photo)
+        photo = Photo.objects.get(Q(id=request.query_params["photo_id"]))
+        photo.delete()
         return Response(1)
 
 @api_view(['GET'])
@@ -244,32 +257,6 @@ def SetMessageIsReadStatus(request, message_id):
     return Response(1)
 
 
-
-
-@api_view(['POST'])
-def addFollow(request):
-    try:
-        follow = Follow.objects.get(Q(user=request.data['user_id']) & Q(other_user=request.data['other_user_id']))
-        return Response(0)
-    except Exception:
-        new_follow = Follow()
-        user = Profile.objects.get(Q(id=request.data['user_id']))
-        other_user = Profile.objects.get(Q(id=request.data['other_user_id']))
-        new_follow.user = user
-        new_follow.other_user = other_user
-        new_follow.follow_time = datetime.timedelta(days=30)
-        new_follow.save()
-        return Response(1)
-
-
-@api_view(['POST'])
-def removeFollow(request):
-    try:
-        follow = Follow.objects.get(Q(user=request.data['user_id']) & Q(other_user=request.data['other_user_id']))
-        follow.delete()
-        return Response(1)
-    except Exception:
-        return Response(0)
 
 
 @api_view(['GET'])
