@@ -72,6 +72,7 @@ class LectureSerializer(serializers.ModelSerializer):
             "course",
             "is_preview",
             "is_comment_check",
+            "is_last_viewed",
             "get_absolute_url",
             "get_media"
         )

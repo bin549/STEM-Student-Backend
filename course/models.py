@@ -86,6 +86,7 @@ class Lecture(models.Model):
     format = models.ForeignKey(Format, null=True, blank=True, on_delete=models.CASCADE)
     is_preview = models.BooleanField(default=False, null=True)
     is_comment_check = models.BooleanField(default=False, null=True)
+    is_last_viewed = models.BooleanField(default=False, null=True)
     course = models.ForeignKey(Entity, null=True, blank=True, on_delete=models.CASCADE)
 
     def __str__(self):

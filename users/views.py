@@ -114,9 +114,9 @@ class MessageAPI(APIView):
 
     def post(self, request, format=None):
         message = Message()
-        message.sender = Profile.objects.get(id=request.data['sender'])
-        message.title = request.data['title']
-        message.content = request.data['content']
+        message.sender = Profile.objects.get(id=request.query_params['sender'])
+        message.title = request.query_params['title']
+        message.content = request.query_params['content']
         message.is_read = False
         message.created_time = datetime.timedelta(days=30)
         user_type = Type.objects.get(name='manager')

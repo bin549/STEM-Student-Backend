@@ -2,7 +2,7 @@ from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 
 
 def paginateCourses(request, courses, results):
-    page = request.data['page']
+    page = request.query_params['page']
     paginator = Paginator(courses, results)
     try:
         courses = paginator.page(page)

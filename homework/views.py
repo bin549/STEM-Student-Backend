@@ -73,52 +73,54 @@ class MediaAPI(APIView):
 
 class StarAPI(APIView):
 
-    def get(self, request, user_id, format=None):
-        stars = ExecutionStar.objects.filter(Q(user=user_id))
-        executions = []
-        for star in stars:
-            execution = Execution.objects.get(Q(id=star.execution.id))
-            user = Profile.objects.get(Q(id=execution.user.id))
-            content_images = []
-            media_type = MediaType.objects.get(Q(name="Photo"))
-            medias = Media.objects.filter(
-                Q(execution=execution.id) & Q(type=media_type))
-            for media in medias:
-                content_images.append(media.get_media())
-            n_execution = {
-                            'id': execution.id,
-                           'user_name': user.name,
-                           'user_image': user.get_image(),
-                           'user_id': user.id,
-                           'finish_time': execution.finish_time,
-                           'content_text': execution.content_text,
-                           'content_images': content_images
-                           }
-            executions.append(n_execution)
-        return Response(executions)
+    def get(self, request, format=None):
+        if request.query_params.__contains__("execution_id"):
+            try:
+                ExecutionStar.objects.get(Q(user=request.query_params['user_id']) & Q(execution=request.query_params['execution_id']))
+                return Response(1)
+            except Exception:
+                return Response(0)
+        else:
+            stars = ExecutionStar.objects.filter(Q(user=request.query_params['user_id']))
+            executions = []
+            for star in stars:
+                execution = Execution.objects.get(Q(id=star.execution.id))
+                user = Profile.objects.get(Q(id=execution.user.id))
+                content_images = []
+                media_type = MediaType.objects.get(Q(name="Photo"))
+                medias = Media.objects.filter(
+                    Q(execution=execution.id) & Q(type=media_type))
+                for media in medias:
+                    content_images.append(media.get_media())
+                n_execution = {
+                                'id': execution.id,
+                               'user_name': user.name,
+                               'user_image': user.get_image(),
+                               'user_id': user.id,
+                               'finish_time': execution.finish_time,
+                               'content_text': execution.content_text,
+                               'content_images': content_images
+                               }
+                executions.append(n_execution)
+            return Response(executions)
 
     def post(self, request, format=None):
-        if "mode" in request.data:
-            if request.data["mode"] == "fetch":
-                try:
-                    ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
-                    return Response(1)
-                except Exception:
-                    return Response(0)
-            elif request.data["mode"] == "update":
-                if request.data["status"]:
-                    star = ExecutionStar()
-                    user = Profile.objects.get(Q(id=request.data['user_id']))
-                    execution = Execution.objects.get(Q(id=request.data['execution_id']))
-                    star.user = user
-                    star.execution = execution
-                    star.star_time = datetime.timedelta(days=30)
-                    star.save()
-                    return Response(1)
-                else:
-                    star = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
-                    star.delete()
-                return Response(0)
+        star = ExecutionStar()
+        user = Profile.objects.get(Q(id=request.query_params['user_id']))
+        execution = Execution.objects.get(Q(id=request.query_params['execution_id']))
+        star.user = user
+        star.execution = execution
+        star.star_time = datetime.timedelta(days=30)
+        star.save()
+        return Response(1)
+
+    def delete(self, request, format=None):
+        star = ExecutionStar.objects.get(Q(user=request.query_params['user_id']) & Q(execution=request.query_params['execution_id']))
+        star.delete()
+        return Response(1)
+
+
+
 
 # @api_view(['POST'])
 # def loadExecution(request):
@@ -134,13 +136,8 @@ class StarAPI(APIView):
 
 class ExecutionAPI(APIView):
 
-    def post(self, request, format=None):
-        if "homework_id" in request.data:
-            execution = Execution.objects.get(Q(homework=request.data['homework_id']) & Q(user=request.data['user_id']))
-            serializer = ExecutionSerializer(execution, many=False)
-            return Response(serializer.data)
-
-        elif "is_excellent" in request.data:
+    def get(self, request, format=None):
+        if request.query_params.__contains__("is_excellent"):
             executions = Execution.objects.filter(Q(is_excellent=True))
             n_executions = []
             for execution in executions:
@@ -162,6 +159,12 @@ class ExecutionAPI(APIView):
                                }
                 n_executions.append(n_execution)
             return Response(n_executions)
+
+    def post(self, request, format=None):
+        if "homework_id" in request.data:
+            execution = Execution.objects.get(Q(homework=request.data['homework_id']) & Q(user=request.data['user_id']))
+            serializer = ExecutionSerializer(execution, many=False)
+            return Response(serializer.data)
         else:
             return Response(1)
 
@@ -220,47 +223,6 @@ def getExecutionExcellentById(request, execution_id):
     execution.is_excellent = True
     execution.save()
     return Response(1)
-
-
-@api_view(['POST'])
-def getCheckedExecutions(request):
-    if request.data['is_check'] == False:
-        executions = Execution.objects.filter(Q(homework=request.data['id']) & Q(score=None))
-    else:
-        executions = Execution.objects.filter(Q(homework=request.data['id']))
-        executions = executions.exclude(Q(score=None))
-    n_executions = []
-    for execution in executions:
-        user = Profile.objects.get(Q(id=execution.user.id))
-        n_execution = {'id': execution.id, 'userName': user.name,
-                       'finish_time': execution.finish_time, 'score': execution.score,
-                       'is_excellent': execution.is_excellent}
-        n_executions.append(n_execution)
-    return Response(n_executions)
-
-
-@api_view(['GET'])
-def getExcellentExecutions(request, homework_id):
-    executions = Execution.objects.filter(Q(homework=homework_id) & Q(is_excellent=True))
-    n_executions = []
-    for execution in executions:
-        user = Profile.objects.get(Q(id=execution.user.id))
-        n_execution = {'id': execution.id, 'userName': user.name,
-                       'finish_time': execution.finish_time, 'score': execution.score,
-                       'is_excellent': execution.is_excellent}
-        n_executions.append(n_execution)
-    return Response(n_executions)
-
-
-
-@api_view(['GET'])
-def getExcellentExecutionUserNames(request, homework_id):
-    executions = Execution.objects.filter(Q(homework=homework_id) & Q(is_excellent=True))
-    userNames = []
-    for execution in executions:
-        user = Profile.objects.get(Q(id=execution.user.id))
-        userNames.append(user.name)
-    return Response(userNames)
 
 
 @api_view(['POST'])
@@ -341,17 +303,6 @@ def getUnfinishHomework(request, user_id):
         serializer = HomeworkSerializer(homework, many=False)
         homeworks.append(serializer.data)
     return Response(homeworks)
-
-
-
-@api_view(['POST'])
-def removeStar(request):
-    try:
-        star = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
-        star.delete()
-        return Response(1)
-    except Exception:
-        return Response(0)
 
 
 @api_view(['GET'])
