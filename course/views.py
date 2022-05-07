@@ -145,41 +145,40 @@ class SelectionAPI(APIView):
 
 
     def post(self, request, format=None):
-        if "serial_number" in request.data:
+        try:
+            user = Profile.objects.get(Q(id=request.query_params['user_id']))
+            course = Entity.objects.get(Q(serial_number=request.query_params['serial_number']))
+        except Exception:
+            return Response('课程不存在', status=status.HTTP_201_CREATED)
+        try:
+            existed_selection = Selection.objects.get(Q(user=user.id) & Q(course=course.id))
+            if existed_selection:
+                return Response('课程正在进行中', status=status.HTTP_201_CREATED)
+        except Exception:
             try:
-                user = Profile.objects.get(Q(id=request.data['user_id']))
-                course = Entity.objects.get(Q(serial_number=request.data['serial_number']))
+                wishlist = Wishlist.objects.get(Q(user=user.id) & Q(course=course.id))
+                wishlist.delete()
             except Exception:
-                return Response('课程不存在', status=status.HTTP_201_CREATED)
-            try:
-                existed_selection = Selection.objects.get(Q(user=user.id) & Q(course=course.id))
-                if existed_selection:
-                    return Response('课程正在进行中', status=status.HTTP_201_CREATED)
-            except Exception:
-                try:
-                    wishlist = Wishlist.objects.get(Q(user=user.id) & Q(course=course.id))
-                    wishlist.delete()
-                except Exception:
-                    print('wishlist was deleted!')
-                selection = Selection()
-                selection.user = user
-                selection.course = course
-                selection.select_time = datetime.timedelta(days=30)
-                selection.save()
-                homeworks = Assignment.objects.filter(Q(course=course.id))
-                for homework in homeworks:
-                    execution = Execution()
-                    execution.homework = homework
-                    execution.user = user
-                    execution.save()
-                lectures = Lecture.objects.filter(course=course.id)
-                for lecture in lectures:
-                    progress = Progress()
-                    progress.user = user
-                    progress.lecture = lecture
-                    progress.percent = 0.0
-                    progress.save()
-            return Response('Register Success.')
+                print('wishlist was deleted!')
+            selection = Selection()
+            selection.user = user
+            selection.course = course
+            selection.select_time = datetime.timedelta(days=30)
+            selection.save()
+            homeworks = Assignment.objects.filter(Q(course=course.id))
+            for homework in homeworks:
+                execution = Execution()
+                execution.homework = homework
+                execution.user = user
+                execution.save()
+            lectures = Lecture.objects.filter(course=course.id)
+            for lecture in lectures:
+                progress = Progress()
+                progress.user = user
+                progress.lecture = lecture
+                progress.percent = 0.0
+                progress.save()
+        return Response('Register Success.')
 
 
 class CommentAPI(APIView):

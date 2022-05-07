@@ -140,8 +140,8 @@ class PhotoAPI(APIView):
             return Response(serializer.data)
 
     def post(self, request, format=None):
-        medias = request.data["medias"]
-        user = Profile.objects.get(Q(id=request.data["user_id"]))
+        medias = request.query_params["medias"]
+        user = Profile.objects.get(Q(id=request.query_params["user_id"]))
         for media in medias:
             photo = Photo()
             photo.media = media
