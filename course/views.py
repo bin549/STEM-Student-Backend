@@ -178,7 +178,7 @@ class SelectionAPI(APIView):
                 progress.lecture = lecture
                 progress.percent = 0.0
                 progress.save()
-        return Response('Register Success.')
+        return Response(1)
 
 
 class CommentAPI(APIView):
