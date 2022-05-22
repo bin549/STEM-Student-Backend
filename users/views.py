@@ -18,13 +18,20 @@ class ProfileAPI(APIView):
         return Response(serializer.data)
 
     def post(self, request, format=None):
-        print(request.data)
-        if request.data["mode"] == "owner":
-            course = Entity.objects.get(Q(title=request.data["course_name"]))
-            owner = Profile.objects.get(Q(id=course.owner.id))
-            serializer = UserSerializer(owner, many=False)
-            return Response(serializer.data)
-
+        profile = Profile()
+        profile.username = request.data["username"]
+        profile.email = request.data["email"]
+        profile.password = request.data["password"]
+        profile.name = request.data["username"]
+        profile.location = None
+        profile.short_intro = None
+        profile.bio = None
+        profile.profile_image = None
+        profile.created_time = datetime.timedelta(days=30)
+        profile.type = Type.objects.get(Q(name="student"))
+        profile.profile_image = None
+        profile.save()
+        return Response(1)
 
 class FollowAPI(APIView):
 

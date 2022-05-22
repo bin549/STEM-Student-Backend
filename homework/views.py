@@ -17,7 +17,7 @@ class AssignmentAPI(APIView):
         executions = Execution.objects.filter(Q(user=user_id))
         homeworks = []
         for execution in executions:
-            homework = {"id": execution.homework.id, "intro": execution.homework.intro, "description": execution.homework.description[0:50]+"...", 'finish_time': execution.finish_time, "appraise_text": execution.appraise_text}
+            homework = {"id": execution.homework.id, "intro": execution.homework.intro, "description": execution.homework.description[0:350]+"...", 'finish_time': execution.finish_time, "appraise_text": execution.appraise_text}
             homeworks.append(homework)
         return Response(homeworks)
 

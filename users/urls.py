@@ -16,7 +16,7 @@ urlpatterns = [
     path('SetMessageIsReadStatus/<str:message_id>/', views.SetMessageIsReadStatus),
 
 
-
+    path('registerUser/', views.ProfileAPI.as_view()),
     path('getProfile/<str:user_id>/', views.ProfileAPI.as_view()),
     path('getOwner/', views.ProfileAPI.as_view()),
     path('getFollow/', views.FollowAPI.as_view()),
