@@ -12,7 +12,6 @@ from .serializers import UserSerializer, TypeSerializer, MessageSerializer, Note
 class ProfileAPI(APIView):
 
     def get(self, request, user_id, format=None):
-
         profile = Profile.objects.get(id=user_id)
         serializer = UserSerializer(profile, many=False)
         return Response(serializer.data)
