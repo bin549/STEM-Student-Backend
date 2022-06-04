@@ -11,8 +11,11 @@ from .serializers import UserSerializer, TypeSerializer, MessageSerializer, Note
 
 class ProfileAPI(APIView):
 
-    def get(self, request, user_id, format=None):
-        profile = Profile.objects.get(id=user_id)
+    def get(self, request, format=None):
+        if request.query_params.__contains__("course_name"):
+            profile = Entity.objects.get(Q(title=request.query_params["course_name"])).owner
+        else:
+            profile = Profile.objects.get(id=request.query_params["user_id"])
         serializer = UserSerializer(profile, many=False)
         return Response(serializer.data)
 
@@ -146,7 +149,6 @@ class PhotoAPI(APIView):
             return Response(serializer.data)
 
     def post(self, request, format=None):
-        print(request.data)
         medias = request.data["medias"]
         user = Profile.objects.get(Q(id=request.data["user_id"]))
         for media in medias:

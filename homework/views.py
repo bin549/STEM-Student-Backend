@@ -13,43 +13,22 @@ from .models import Assignment, Execution, MediaType, Media, ExecutionStar, Log,
 
 class AssignmentAPI(APIView):
 
-    def get(self, request, user_id, format=None):
-        executions = Execution.objects.filter(Q(user=user_id))
-        homeworks = []
-        for execution in executions:
-            homework = {"id": execution.homework.id, "intro": execution.homework.intro, "description": execution.homework.description[0:350]+"...", 'finish_time': execution.finish_time, "appraise_text": execution.appraise_text}
-            homeworks.append(homework)
-        return Response(homeworks)
-
-
-    def post(self, request, format=None):
-        if "homework_id" in request.data:
-            homework = Assignment.objects.get(Q(id=request.data["homework_id"]))
+    def get(self, request, format=None):
+        if request.query_params.__contains__("homework_id"):
+            homework = Assignment.objects.get(Q(id=request.query_params["homework_id"]))
             serializer = HomeworkSerializer(homework, many=False)
             return Response(serializer.data)
-        elif "course_id" in request.data:
-            executions = Execution.objects.filter(Q(user=request.data['user_id']))
-            userHomeworks = []
-            for execution in executions:
-                try:
-                    homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['course_id']))
-                    userHomework = {'id': homework.id, 'description': homework.description[0:50]+"...",  'intro': homework.intro, 'start_time': homework.start_time,
-                                    'end_time': homework.end_time, 'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
-                    userHomeworks.append(userHomework)
-                except Exception:
-                    pass
-            return Response(userHomeworks)
-        elif "is_finish" in request.data:
-            if request.data["is_finish"]:
-                executions = Execution.objects.filter(Q(user=request.data['user_id']))
+        elif request.query_params.__contains__("is_finish"):
+            if request.query_params["is_finish"]:
+                executions = Execution.objects.filter(Q(user=request.query_params['user_id']))
                 executions = executions.exclude(Q(finish_time=None))
             else:
-                executions = Execution.objects.filter(Q(user=request.data['user_id']) & Q(finish_time=None))
+                executions = Execution.objects.filter(Q(user=request.query_params['user_id']) & Q(finish_time=None))
             userHomeworks = []
             for execution in executions:
                 try:
-                    if request.data['courseId'] != 0:
-                        homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
+                    if request.query_params['course_id'] != 0:
+                        homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.query_params['course_id']))
                     else:
                         homework = Assignment.objects.get(Q(id=execution.homework.id))
                     userHomework = {"id": execution.homework.id, "intro": execution.homework.intro, "description": execution.homework.description[0:50]+"...",
@@ -58,7 +37,25 @@ class AssignmentAPI(APIView):
                 except Exception:
                     pass
             return Response(userHomeworks)
-
+        elif request.query_params.__contains__("course_id"):
+            executions = Execution.objects.filter(Q(user=request.query_params['user_id']))
+            userHomeworks = []
+            for execution in executions:
+                try:
+                    homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.query_params['course_id']))
+                    userHomework = {'id': homework.id, 'description': homework.description[0:50]+"...",  'intro': homework.intro, 'start_time': homework.start_time,
+                                    'end_time': homework.end_time, 'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
+                    userHomeworks.append(userHomework)
+                except Exception:
+                    pass
+            return Response(userHomeworks)
+        else:
+            executions = Execution.objects.filter(Q(user=request.query_params["user_id"]))
+            homeworks = []
+            for execution in executions:
+                homework = {"id": execution.homework.id, "intro": execution.homework.intro, "description": execution.homework.description[0:350]+"...", 'finish_time': execution.finish_time, "appraise_text": execution.appraise_text}
+                homeworks.append(homework)
+            return Response(homeworks)
 
 
 class MediaAPI(APIView):
@@ -159,14 +156,10 @@ class ExecutionAPI(APIView):
                                }
                 n_executions.append(n_execution)
             return Response(n_executions)
-
-    def post(self, request, format=None):
-        if "homework_id" in request.data:
-            execution = Execution.objects.get(Q(homework=request.data['homework_id']) & Q(user=request.data['user_id']))
+        else:
+            execution = Execution.objects.get(Q(homework=request.query_params['homework_id']) & Q(user=request.query_params['user_id']))
             serializer = ExecutionSerializer(execution, many=False)
             return Response(serializer.data)
-        else:
-            return Response(1)
 
 
 class LogAPI(APIView):

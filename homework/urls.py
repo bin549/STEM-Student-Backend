@@ -19,18 +19,17 @@ urlpatterns = [
 
 
     path('getHomeworks/<str:user_id>/', views.AssignmentAPI.as_view()),
-    path('getHomeworkById/', views.AssignmentAPI.as_view()),
-    path('fetchCourseHomeworks/', views.AssignmentAPI.as_view()),
-    path('fetchFinishHomeworks/', views.AssignmentAPI.as_view()),
-    path('getExecutions/', views.ExecutionAPI.as_view()),
-    path('getExecution/', views.ExecutionAPI.as_view()),
+    path('Homework/getById/', views.AssignmentAPI.as_view()),
+    path('Homework/getByUserId/', views.AssignmentAPI.as_view()),
+    path('Homework/getByCourseId/', views.AssignmentAPI.as_view()),
+    path('Homework/getByFinish/', views.AssignmentAPI.as_view()),
+    path('Execution/getAll/', views.ExecutionAPI.as_view()),
+    path('Execution/get/', views.ExecutionAPI.as_view()),
     path('getExecutionImages/<str:execution_id>/', views.MediaAPI.as_view()),
-    path('getStar/', views.StarAPI.as_view()),
-    path('getStars/', views.StarAPI.as_view()),
-    path('createStar/', views.StarAPI.as_view()),
-    path('deleteStar/', views.StarAPI.as_view()),
-
-
+    path('Star/create/', views.StarAPI.as_view()),
+    path('Star/delete/', views.StarAPI.as_view()),
+    path('Star/get/', views.StarAPI.as_view()),
+    path('Star/getAll/', views.StarAPI.as_view()),
 
 
     path('createActivityLog/<str:execution_id>/', views.LogAPI.as_view()),

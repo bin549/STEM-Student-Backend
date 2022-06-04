@@ -22,6 +22,18 @@ class CourseAPI(APIView):
             course = Entity.objects.get(title=request.query_params["course_name"])
             serializer = CourseSerializer(course, many=False)
             return Response(serializer.data)
+        elif request.query_params.__contains__("user_id"):
+            selections = Selection.objects.filter(Q(user=request.query_params["user_id"]))
+            course_ids = set()
+            for e in selections:
+                course_ids.add(e.course.id)
+            try:
+                genre = Genre.objects.get(Q(name=request.query_params['genre']))
+                courses = Entity.objects.filter(Q(genre=genre.id) & Q(id__in=course_ids))
+            except Exception:
+                courses = Entity.objects.filter(Q(id__in=course_ids))
+            serializer = CourseSerializer(courses, many=True)
+            return Response(serializer.data)
         elif request.query_params.__contains__("option"):
             if request.query_params["option"] == "recommend":
                 if request.query_params.__contains__("user_id"):
@@ -41,27 +53,14 @@ class CourseAPI(APIView):
                 random.shuffle(courseData)
                 return Response(courseData[0:int(request.query_params['limit'])])
             elif request.query_params["option"] == "condition":
-                if request.query_params.__contains__("user_id"):
-                    selections = Selection.objects.filter(Q(user=request.query_params["user_id"]))
-                    course_ids = set()
-                    for e in selections:
-                        course_ids.add(e.course.id)
-                    try:
-                        genre = Genre.objects.get(Q(name=request.query_params['genre']))
-                        courses = Entity.objects.filter(Q(genre=genre.id) & Q(id__in=course_ids))
-                    except Exception:
-                        courses = Entity.objects.filter(Q(id__in=course_ids))
-                    serializer = CourseSerializer(courses, many=True)
-                    return Response(serializer.data)
-                else:
-                    try:
-                        genre = Genre.objects.get(Q(name=request.query_params['genre']))
-                        courses = Entity.objects.filter(Q(is_visible=True) & Q(genre=genre.id))
-                    except Exception:
-                        courses = Entity.objects.filter(Q(is_visible=True))
-                    courses = paginateCourses(request, courses, request.query_params['pageSize'])
-                    serializer = CourseSerializer(courses, many=True)
-                    return Response(serializer.data)
+                try:
+                    genre = Genre.objects.get(Q(name=request.query_params['genre']))
+                    courses = Entity.objects.filter(Q(is_visible=True) & Q(genre=genre.id))
+                except Exception:
+                    courses = Entity.objects.filter(Q(is_visible=True))
+                courses = paginateCourses(request, courses, request.query_params['pageSize'])
+                serializer = CourseSerializer(courses, many=True)
+                return Response(serializer.data)
             elif request.query_params["option"] == "count":
                 if request.query_params.__contains__("user_id"):
                     selections = Selection.objects.filter(Q(user=request.query_params['user_id']))
