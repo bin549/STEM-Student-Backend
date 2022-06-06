@@ -3,13 +3,6 @@ from users import views
 
 
 urlpatterns = [
-    path('getUserNameById/<str:user_id>/', views.getUserNameById),
-    path('updateUser/', views.updateUser),
-    path('registerUser/', views.ProfileAPI.as_view()),
-    path('getCourseOwner/', views.ProfileAPI.as_view()),
-    path('getOwner/', views.ProfileAPI.as_view()),
-
-
     path('user/create/', views.UserAPI.as_view()),
     path('follow/create/', views.FollowAPI.as_view()),
     path('follow/delete/', views.FollowAPI.as_view()),

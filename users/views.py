@@ -13,7 +13,7 @@ from django.contrib.auth.models import User
 class UserAPI(APIView):
 
     def post(self, request, format=None):
-        
+
         user = User()
         user.username = request.data["username"]
         user.email = request.data["email"]
@@ -194,20 +194,3 @@ def getUserById(request, user_id):
     profile = Profile.objects.get(id=user_id)
     serializer = UserSerializer(profile, many=False)
     return Response(serializer.data)
-
-
-@api_view(['GET'])
-def getUserNameById(request, user_id):
-    profile = Profile.objects.get(id=user_id)
-    serializer = UserSerializer(profile, many=False)
-    return Response(serializer.data['name'])
-
-
-
-
-@api_view(['POST'])
-def updateUser(request):
-    user = Profile.objects.get(id=request.data['userId'])
-    user.profile_image = request.data['profile_image']
-    user.save()
-    return Response(1)
