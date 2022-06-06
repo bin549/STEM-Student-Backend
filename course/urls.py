@@ -3,14 +3,6 @@ from course import views
 
 
 urlpatterns = [
-    path('getAllVisibleCourse/', views.AllVisibleCourse.as_view()),
-    path('courses/<slug:genre_slug>/', views.GenreDetail.as_view()),
-    path('getCourseVisibleStatus/', views.getCourseVisibleStatus),
-    path('getCourseOwner/', views.getCourseOwner),
-    path('getCourseGenre/<str:genre_id>/', views.getCourseGenre),
-    path('getLectureFormat/<str:format_id>/', views.getLectureFormat),
-    path('loadCurrentSelectCourseTitle/<str:course_id>/', views.loadCurrentSelectCourseTitle),
-
     path('course/getAll/', views.CourseAPI.as_view()),
     path('course/getRecomendentions/', views.CourseAPI.as_view()),
     path('course/getCount/', views.CourseAPI.as_view()),
@@ -27,9 +19,7 @@ urlpatterns = [
     path('wishlist/create/', views.WishlistAPI.as_view()),
     path('wishlist/delete/', views.WishlistAPI.as_view()),
     path('wishlist/get/', views.WishlistAPI.as_view()),
-    path('getWishlistCourses/', views.WishlistAPI.as_view()),
     path('comment/getAll/', views.CommentAPI.as_view()),
-    path('getCommentsByUserId/', views.CommentAPI.as_view()),
     path('comment/create/', views.CommentAPI.as_view()),
     path('comment/delete/', views.CommentAPI.as_view()),
     path('history/create/', views.HistoryAPI.as_view()),

@@ -3,34 +3,17 @@ from homework import views
 
 
 urlpatterns = [
-    path('getAllHomework/', views.AllHomework.as_view()),
-    path('getUnfinishHomework/<str:user_id>/', views.getUnfinishHomework),
-    path('uploadHomework/', views.uploadHomework),
-    path('getHomeworkId/<str:execution_id>/', views.getHomeworkId),
-    path('loadCourseUnfinishHomeworks/', views.loadCourseUnfinishHomeworks),
-    path('loadCourseFinishHomeworks/', views.loadCourseFinishHomeworks),
-    path('getSelectedCourseHomeworks/<str:course_id>/', views.getSelectedCourseHomeworks),
-    path('loadUserExecution/', views.loadUserExecution),
-    path('getExecutionsById/<str:homework_id>/', views.getExecutionsById),
-    path('getExecutionExcellentById/<str:execution_id>/', views.getExecutionExcellentById),
-    path('getCourseId/<str:homework_id>/', views.getCourseId),
-    path('getExecutionById/<str:execution_id>/', views.getExecutionById),
-
-
-
-    path('getHomeworks/<str:user_id>/', views.AssignmentAPI.as_view()),
-    path('Homework/getById/', views.AssignmentAPI.as_view()),
-    path('Homework/getByUserId/', views.AssignmentAPI.as_view()),
-    path('Homework/getByCourseId/', views.AssignmentAPI.as_view()),
-    path('Homework/getByFinish/', views.AssignmentAPI.as_view()),
-    path('Execution/getAll/', views.ExecutionAPI.as_view()),
-    path('Execution/get/', views.ExecutionAPI.as_view()),
-    path('getExecutionImages/<str:execution_id>/', views.MediaAPI.as_view()),
-    path('Star/create/', views.StarAPI.as_view()),
-    path('Star/delete/', views.StarAPI.as_view()),
-    path('Star/get/', views.StarAPI.as_view()),
-    path('Star/getAll/', views.StarAPI.as_view()),
-
-
-    path('createActivityLog/<str:execution_id>/', views.LogAPI.as_view()),
+    path('homework/getById/', views.AssignmentAPI.as_view()),
+    path('homework/getByUserId/', views.AssignmentAPI.as_view()),
+    path('homework/getByCourseId/', views.AssignmentAPI.as_view()),
+    path('homework/getByFinish/', views.AssignmentAPI.as_view()),
+    path('execution/update/', views.ExecutionAPI.as_view()),
+    path('execution/getAll/', views.ExecutionAPI.as_view()),
+    path('execution/get/', views.ExecutionAPI.as_view()),
+    path('media/getByExecutionId/', views.MediaAPI.as_view()),
+    path('star/create/', views.StarAPI.as_view()),
+    path('star/delete/', views.StarAPI.as_view()),
+    path('star/get/', views.StarAPI.as_view()),
+    path('star/getAll/', views.StarAPI.as_view()),
+    path('activityLog/create/', views.LogAPI.as_view()),
 ]

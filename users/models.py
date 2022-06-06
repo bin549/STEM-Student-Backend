@@ -2,6 +2,8 @@ import uuid
 import os
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+
 
 class Type(models.Model):
 

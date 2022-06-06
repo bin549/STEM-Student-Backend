@@ -60,8 +60,8 @@ class AssignmentAPI(APIView):
 
 class MediaAPI(APIView):
 
-    def get(self, request, execution_id, format=None):
-        execution = Execution.objects.get(Q(id=execution_id))
+    def get(self, request, format=None):
+        execution = Execution.objects.get(Q(id=request.query_params["execution_id"]))
         media_type = MediaType.objects.get(Q(name="Photo"))
         medias = Media.objects.filter(Q(execution=execution.id) & Q(type=media_type))
         serializer = MediaSerializer(medias, many=True)
@@ -117,20 +117,6 @@ class StarAPI(APIView):
         return Response(1)
 
 
-
-
-# @api_view(['POST'])
-# def loadExecution(request):
-#     executions = Execution.objects.filter(Q(homework=request.data['homeworkId']))
-#     userHomeworks = []
-#     for execution in executions:
-#         user = Profile.objects.get(Q(id=homework.user))
-#         userHomework = {'username': user.name, 'finish_time': execution.finish_time,
-#                         'is_excellent': execution.is_excellent, 'score': execution.score}
-#         userHomeworks.append(userHomework)
-#     return Response(1)
-
-
 class ExecutionAPI(APIView):
 
     def get(self, request, format=None):
@@ -161,167 +147,34 @@ class ExecutionAPI(APIView):
             serializer = ExecutionSerializer(execution, many=False)
             return Response(serializer.data)
 
+    def put(self, request, format=None):
+        execution = Execution.objects.get(Q(homework=request.data['homework_id']) & Q(user=request.data['user_id']))
+        execution.finish_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        execution.content_text = request.data['content_text']
+        photo_format = ('png', 'jpg', 'jpeg', 'bmp', 'gif')
+        video_format = ('mp4', 'mov')
+        for content_media in request.data['content_medias']:
+            media = Media()
+            if content_media.split('.')[-1].lower() in photo_format:
+                media_type = MediaType.objects.get(Q(name='Photo'))
+            elif content_media.split('.')[-1].lower() in video_format:
+                media_type = MediaType.objects.get(Q(name='Video'))
+            media.media = content_media
+            media.execution = execution
+            media.type = media_type
+            media.save()
+        execution.save()
+        return Response(1)
+
 
 class LogAPI(APIView):
 
-    def post(self, request, execution_id, format=None):
+    def post(self, request, format=None):
         log = Log()
-        execution = Execution.objects.get(Q(id=execution_id))
+        execution = Execution.objects.get(Q(id=request.data["execution_id"]))
         log_type = LogType.objects.get(Q(name="提交"))
         log.execution = execution
         log.log_type = log_type
         log.log_time = datetime.timedelta(days=30)
         log.save()
         return Response(1)
-
-
-class AllHomework(APIView):
-
-    def get(self, request, format=None):
-        homeworks = Homework.objects.all()[0:4]
-        serializer = HomeworkSerializer(homeworks, many=True)
-        return Response(serializer.data)
-
-
-@api_view(['GET'])
-def getSelectedCourseHomeworks(request, course_id):
-    homeworks = Assignment.objects.filter(Q(course=course_id))
-    serializer = HomeworkSerializer(homeworks, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['POST'])
-def loadUserExecution(request):
-    execution = Execution.objects.get(Q(homework=request.data['homeworkId']) & Q(user=request.data['userId']))
-    serializer = ExecutionSerializer(execution, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def getExecutionsById(request, homework_id):
-    executions = Execution.objects.filter(Q(homework=homework_id))
-    n_executions = []
-    for execution in executions:
-        user = Profile.objects.get(Q(id=execution.user.id))
-        n_execution = {'id': execution.id, 'userName': user.name,
-                       'finish_time': execution.finish_time, 'score': execution.score,
-                       'is_excellent': execution.is_excellent}
-        n_executions.append(n_execution)
-    return Response(n_executions)
-
-
-@api_view(['GET'])
-def getExecutionExcellentById(request, execution_id):
-    execution = Execution.objects.get(Q(id=execution_id))
-    execution.is_excellent = True
-    execution.save()
-    return Response(1)
-
-
-@api_view(['POST'])
-def uploadHomework(request):
-    execution = Execution.objects.get(Q(homework=request.data['homeworkId']) & Q(user=request.data['userId']))
-    execution.finish_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-    execution.content_text = request.data['contentText']
-    photo_format = ('png', 'jpg', 'jpeg', 'bmp', 'gif')
-    video_format = ('mp4', 'mov')
-    for contentMedia in request.data['contentMedia']:
-        media = Media()
-        if contentMedia.split('.')[-1].lower() in photo_format:
-            media_type = MediaType.objects.get(Q(name='Photo'))
-        elif contentMedia.split('.')[-1].lower() in video_format:
-            media_type = MediaType.objects.get(Q(name='Video'))
-        media.media = contentMedia
-        media.execution = execution
-        media.type = media_type
-        media.save()
-    execution.save()
-    return Response(1)
-
-@api_view(['POST'])
-def loadHomeworks(request):
-    homeworks = Assignment.objects.filter(Q(course=request.data['courseId']))
-    userHomeworks = []
-    for homework in homeworks:
-        execution = Execution.objects.get(Q(homework=homework.id) & Q(user=request.data['userId']))
-        userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
-                        'end_time': homework.end_time, 'score': execution.score,
-                        'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
-        userHomeworks.append(userHomework)
-    return Response(userHomeworks)
-
-
-@api_view(['POST'])
-def loadCourseUnfinishHomeworks(request):
-    executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(finish_time=None))
-    # executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
-    userHomeworks = []
-    for execution in executions:
-        try:
-            homework = Assignment.objects.get(Q(id=execution.homework.id) & Q(course=request.data['courseId']))
-            userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
-                            'end_time': homework.end_time, 'score': execution.score,
-                            'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
-            userHomeworks.append(userHomework)
-        except Exception:
-            pass
-    return Response(userHomeworks)
-
-
-@api_view(['POST'])
-def loadCourseFinishHomeworks(request):
-    executions = Execution.objects.filter(Q(user=request.data['userId']))
-    executions = executions.exclude(Q(finish_time=None))
-    # executions = Execution.objects.filter(Q(user=request.data['userId']) & Q(course=request.data['courseId']))
-    userHomeworks = []
-    for execution in executions:
-        try:
-            homework = Assignment.objects.get(
-                Q(id=execution.homework.id) & Q(course=request.data['courseId']))
-            userHomework = {'id': homework.id, 'description': homework.description,  'intro': homework.intro, 'start_time': homework.start_time,
-                            'end_time': homework.end_time, 'score': execution.score,
-                            'finish_time': execution.finish_time, 'is_excellent': execution.is_excellent}
-            userHomeworks.append(userHomework)
-        except Exception:
-            pass
-    return Response(userHomeworks)
-
-
-@api_view(['GET'])
-def getUnfinishHomework(request, user_id):
-    executions = Execution.objects.filter(Q(user=user_id) & Q(finish_time=None))
-    homeworks = []
-    for execution in executions:
-        homework = Assignment.objects.get(Q(id=execution.homework.id))
-        serializer = HomeworkSerializer(homework, many=False)
-        homeworks.append(serializer.data)
-    return Response(homeworks)
-
-
-@api_view(['GET'])
-def getCourseId(request, homework_id):
-    homework = Assignment.objects.get(Q(id=homework_id))
-    return Response(homework.course.id)
-
-
-@api_view(['GET'])
-def getHomeworkId(request, execution_id):
-    execution = Execution.objects.get(Q(id=execution_id))
-    return Response(execution.homework.id)
-
-
-@api_view(['GET'])
-def getExecutionById(request, execution_id):
-    execution = Execution.objects.get(Q(id=execution_id))
-    content_images = []
-    media_type = MediaType.objects.get(Q(name="Photo"))
-    medias = Media.objects.filter(Q(execution=execution.id) & Q(type=media_type))
-    for media in medias:
-        content_images.append(media.get_media())
-    n_execution = {'id': execution.id,
-                   'finish_time': execution.finish_time,
-                   'content_text': execution.content_text,
-                   'is_excellent': execution.is_excellent,
-                   'content_images': content_images
-                   }
-    return Response(n_execution)

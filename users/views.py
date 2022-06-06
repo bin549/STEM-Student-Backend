@@ -7,6 +7,20 @@ from rest_framework.response import Response
 from .models import Profile, Type, Message, Follow, Note, Photo
 from course.models import Entity
 from .serializers import UserSerializer, TypeSerializer, MessageSerializer, NoteSerializer, PhotoSerializer
+from django.contrib.auth.models import User
+
+
+class UserAPI(APIView):
+
+    def post(self, request, format=None):
+        
+        user = User()
+        user.username = request.data["username"]
+        user.email = request.data["email"]
+        user.password = request.data["email"]
+        user.save()
+        return Response(1)
+
 
 
 class ProfileAPI(APIView):
@@ -14,6 +28,8 @@ class ProfileAPI(APIView):
     def get(self, request, format=None):
         if request.query_params.__contains__("course_name"):
             profile = Entity.objects.get(Q(title=request.query_params["course_name"])).owner
+        elif request.query_params.__contains__("username"):
+            profile = Profile.objects.get(name=request.query_params["username"])
         else:
             profile = Profile.objects.get(id=request.query_params["user_id"])
         serializer = UserSerializer(profile, many=False)
@@ -70,16 +86,14 @@ class FollowAPI(APIView):
 
     def post(self, request, format=None):
         follow = Follow()
-        user = Profile.objects.get(Q(id=request.query_params['user_id']))
-        other_user = Profile.objects.get(Q(id=request.query_params['other_user_id']))
-        follow.user = user
-        follow.other_user = other_user
+        follow.user = Profile.objects.get(Q(id=request.data['user_id']))
+        follow.other_user = Profile.objects.get(Q(id=request.data['other_user_id']))
         follow.follow_time = datetime.timedelta(days=30)
         follow.save()
         return Response(1)
 
     def delete(self, request, format=None):
-        follow = Follow.objects.get(Q(user=request.query_params['user_id']) & Q(other_user=request.query_params['other_user_id']))
+        follow = Follow.objects.get(Q(user=request.data['user_id']) & Q(other_user=request.data['other_user_id']))
         follow.delete()
         return Response(1)
 
@@ -96,7 +110,6 @@ class NoteAPI(APIView):
             serializer = NoteSerializer(note, many=False)
             return Response(serializer.data)
 
-
     def post(self, request, format=None):
         note = Note()
         note.user = Profile.objects.get(id=request.query_params['user_id'])
@@ -107,7 +120,6 @@ class NoteAPI(APIView):
         return Response(note.id)
 
     def put(self, request, format=None):
-        print(request.query_params)
         note = Note.objects.get(Q(id=request.query_params["note_id"]))
         note.title = request.query_params["title"]
         note.content = request.query_params["content"]
@@ -175,11 +187,6 @@ class PhotoAPI(APIView):
         photo.delete()
         return Response(1)
 
-@api_view(['GET'])
-def getUserByUserName(request, pk):
-    profile = Profile.objects.get(name=pk)
-    serializer = UserSerializer(profile, many=False)
-    return Response(serializer.data)
 
 
 @api_view(['GET'])
@@ -196,23 +203,6 @@ def getUserNameById(request, user_id):
     return Response(serializer.data['name'])
 
 
-@api_view(['POST'])
-def getUserTypeName(request):
-    type = Type.objects.get(id=request.data['userTypeId'])
-    serializer = TypeSerializer(type, many=False)
-    return Response(serializer.data['name'])
-
-
-@api_view(['GET'])
-def getUsersByTypeName(request, type_name):
-    try:
-        user_type = Type.objects.get(name=type_name)
-    except Exception:
-        return Response('user Type Not Existed', status=status.HTTP_201_CREATED)
-    users = Profile.objects.filter(user_type=user_type.id)
-    serializer = UserSerializer(users, many=True)
-    return Response(serializer.data)
-
 
 
 @api_view(['POST'])
@@ -221,55 +211,3 @@ def updateUser(request):
     user.profile_image = request.data['profile_image']
     user.save()
     return Response(1)
-
-@api_view(['GET'])
-def getInboxUnreadCount(request, user_name):
-    user = Profile.objects.get(name=user_name)
-    messages = Message.objects.filter(Q(recipient=user.id) & Q(is_read=False))
-    return Response(messages.count())
-
-
-@api_view(['GET'])
-def getInboxReadCount(request, user_name):
-    user = Profile.objects.get(name=user_name)
-    messages = Message.objects.filter(Q(recipient=user.id) & Q(is_read=True))
-    return Response(messages.count())
-
-
-@api_view(['POST'])
-def getMessages(request):
-    user = Profile.objects.get(name=request.data['user'])
-    if request.data['is_read'] == None:
-        messages = Message.objects.filter(recipient=user.id)
-    else:
-        if request.data['is_read'] == False:
-            messages = Message.objects.filter(Q(recipient=user.id) & Q(is_read=False))
-        else:
-            messages = Message.objects.filter(Q(recipient=user.id) & Q(is_read=True))
-    serializer = MessageSerializer(messages, many=True)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def getMessage(request, message_id):
-    message = Message.objects.get(id=message_id)
-    serializer = MessageSerializer(message, many=False)
-    return Response(serializer.data)
-
-
-@api_view(['GET'])
-def SetMessageIsReadStatus(request, message_id):
-    message = Message.objects.get(id=message_id)
-    if message.is_read == False:
-        message.is_read = True
-        message.save()
-    return Response(1)
-
-
-
-
-@api_view(['GET'])
-def getUserTypeById(request, user_type_id):
-    type = Type.objects.get(id=user_type_id)
-    serializer = TypeSerializer(type, many=False)
-    return Response(serializer.data)
