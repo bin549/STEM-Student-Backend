@@ -186,11 +186,3 @@ class PhotoAPI(APIView):
         photo = Photo.objects.get(Q(id=request.query_params["photo_id"]))
         photo.delete()
         return Response(1)
-
-
-
-@api_view(['GET'])
-def getUserById(request, user_id):
-    profile = Profile.objects.get(id=user_id)
-    serializer = UserSerializer(profile, many=False)
-    return Response(serializer.data)
