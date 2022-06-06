@@ -13,14 +13,12 @@ from django.contrib.auth.models import User
 class UserAPI(APIView):
 
     def post(self, request, format=None):
-
         user = User()
         user.username = request.data["username"]
         user.email = request.data["email"]
         user.password = request.data["email"]
         user.save()
         return Response(1)
-
 
 
 class ProfileAPI(APIView):

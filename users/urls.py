@@ -12,6 +12,7 @@ urlpatterns = [
     path('message/create/', views.MessageAPI.as_view()),
     path('profile/getByUsername/', views.ProfileAPI.as_view()),
     path('profile/get/', views.ProfileAPI.as_view()),
+    path('profile/getByCourseName/', views.ProfileAPI.as_view()),
     path('note/create/', views.NoteAPI.as_view()),
     path('note/delete/', views.NoteAPI.as_view()),
     path('note/update/', views.NoteAPI.as_view()),
