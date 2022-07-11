@@ -49,6 +49,7 @@ class ProfileAPI(APIView):
         profile.save()
         return Response(1)
 
+
 class FollowAPI(APIView):
 
     def get(self, request, format=None):
@@ -128,6 +129,7 @@ class NoteAPI(APIView):
         note = Note.objects.get(Q(id=request.query_params["note_id"]))
         note.delete()
         return Response(1)
+
 
 class MessageAPI(APIView):
 
