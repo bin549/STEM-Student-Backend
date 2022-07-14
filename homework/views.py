@@ -103,8 +103,8 @@ class StarAPI(APIView):
 
     def post(self, request, format=None):
         star = ExecutionStar()
-        user = Profile.objects.get(Q(id=request.query_params['user_id']))
-        execution = Execution.objects.get(Q(id=request.query_params['execution_id']))
+        user = Profile.objects.get(Q(id=request.data['user_id']))
+        execution = Execution.objects.get(Q(id=request.data['execution_id']))
         star.user = user
         star.execution = execution
         star.star_time = datetime.timedelta(days=30)
@@ -112,7 +112,7 @@ class StarAPI(APIView):
         return Response(1)
 
     def delete(self, request, format=None):
-        star = ExecutionStar.objects.get(Q(user=request.query_params['user_id']) & Q(execution=request.query_params['execution_id']))
+        star = ExecutionStar.objects.get(Q(user=request.data['user_id']) & Q(execution=request.data['execution_id']))
         star.delete()
         return Response(1)
 

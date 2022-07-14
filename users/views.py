@@ -92,6 +92,7 @@ class FollowAPI(APIView):
         return Response(1)
 
     def delete(self, request, format=None):
+        print(request.data)
         follow = Follow.objects.get(Q(user=request.data['user_id']) & Q(other_user=request.data['other_user_id']))
         follow.delete()
         return Response(1)
