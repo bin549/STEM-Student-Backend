@@ -3,3 +3,4 @@ from .models import Assignment, Execution
 
 admin.site.register(Assignment)
 admin.site.register(Execution)
+ 
